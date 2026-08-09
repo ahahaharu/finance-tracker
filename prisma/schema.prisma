@@ -1,13 +1,151 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
-  output   = "../app/generated/prisma"
+  output   = "../lib/generated/prisma"
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "../docs/erd.svg"
+  theme    = "neutral"
+  mmdcPath = "node_modules/.pnpm/node_modules/.bin"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum WalletType {
+  CASH
+  CARD
+  SAVINGS
+}
+
+enum CategoryKind {
+  INCOME
+  EXPENSE
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+  TRANSFER_IN
+  TRANSFER_OUT
+}
+
+enum Currency {
+  BYN
+  USD
+  EUR
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String   @db.VarChar(80)
+  role         Role     @default(USER)
+  baseCurrency Currency @default(BYN)
+  locale       String   @default("ru") @db.VarChar(5)
+  isBlocked    Boolean  @default(false)
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(3)
+
+  wallets      Wallet[]
+  categories   Category[]
+  transactions Transaction[]
+  budgets      Budget[]
+}
+
+model Wallet {
+  id             String     @id @default(cuid())
+  userId         String
+  name           String     @db.VarChar(60)
+  type           WalletType
+  currency       Currency
+  initialBalance Int        @default(0)
+  createdAt      DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime   @updatedAt @db.Timestamptz(3)
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@unique([userId, name])
+}
+
+model Category {
+  id        String       @id @default(cuid())
+  userId    String
+  name      String       @db.VarChar(40)
+  kind      CategoryKind
+  color     String       @db.Char(7)
+  isDefault Boolean      @default(false)
+  createdAt DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime     @updatedAt @db.Timestamptz(3)
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  budgets      Budget[]
+
+  @@unique([userId, kind, name])
+}
+
+model Transaction {
+  id              String          @id @default(cuid())
+  userId          String
+  walletId        String
+  categoryId      String?
+  type            TransactionType
+  amount          Int
+  currency        Currency
+  baseAmount      Int
+  rate            Decimal         @db.Decimal(18, 8)
+  rateDate        DateTime        @db.Date
+  occurredAt      DateTime        @db.Timestamptz(3)
+  note            String?         @db.VarChar(500)
+  transferGroupId String?         @db.Uuid
+  createdAt       DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime        @updatedAt @db.Timestamptz(3)
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wallet   Wallet    @relation(fields: [walletId], references: [id], onDelete: Restrict)
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@index([userId, occurredAt(sort: Desc)])
+  @@index([walletId, occurredAt])
+  @@index([categoryId, occurredAt])
+  @@index([transferGroupId])
+}
+
+model Budget {
+  id          String   @id @default(cuid())
+  userId      String
+  categoryId  String
+  limitAmount Int
+  currency    Currency
+  month       DateTime @db.Date
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, categoryId, month])
+  @@index([userId, month])
+}
+
+model ExchangeRate {
+  id           String   @id @default(cuid())
+  date         DateTime @db.Date
+  fromCurrency Currency
+  toCurrency   Currency
+  rate         Decimal  @db.Decimal(18, 8)
+  fetchedAt    DateTime @default(now()) @db.Timestamptz(3)
+
+  @@unique([date, fromCurrency, toCurrency])
+  @@index([fromCurrency, toCurrency, date(sort: Desc)])
 }

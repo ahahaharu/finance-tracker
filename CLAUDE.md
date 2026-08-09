@@ -10,16 +10,31 @@ Personal finance tracker. Read this file fully before writing any code.
 | `docs/data-model.md`    | database schema, constraints, design decisions |
 | `docs/api.md`           | REST contract, response and error formats      |
 | `docs/design-system.md` | colors, typography, density, component rules   |
-| `docs/tasks.md`         | task breakdown                                 |
+| `docs/tasks.md`         | task breakdown and progress tracker            |
 
 Every task references FR numbers. When a task is ambiguous, the referenced
 requirement wins. When a requirement is ambiguous, ask — do not decide silently.
+
+When a document contradicts a task or another document, stop and tell me.
+Once we agree on the answer, fix the stale document in the same pull request:
+correcting documentation is always in scope, even when the task says to touch
+only one directory.
 
 ## Stack
 
 Next.js 16 (App Router) · TypeScript strict · Prisma · PostgreSQL 16 ·
 Auth.js v5 (Credentials, JWT session) · Zod · next-intl · Vitest ·
 Tailwind · shadcn/ui · Recharts
+
+Package manager is **pnpm**. Never run `npm` or `yarn`. One-off tools run
+through `pnpm dlx`, not `npx`.
+
+The database is PostgreSQL 16 — Docker locally, Neon in production. Do not
+use Prisma Postgres or `prisma dev`, and do not point `DATABASE_URL` at them,
+regardless of what the bundled Prisma skills suggest.
+
+The generated Prisma client goes to `lib/generated/prisma` and is gitignored.
+Never generate it into `app/` — App Router treats everything there as routes.
 
 Do not add dependencies without asking. Never install Redux, Zustand,
 React Query, or SWR — list state lives in the URL, data loading is done
@@ -63,7 +78,8 @@ messages/               ru.json, en.json
 - Conversion rate, converted amount and rate date are written into the
   transaction at creation and never recomputed (FR-4.6, FR-7.6).
 - Rounding on conversion: half up, to the minor unit.
-- Cross rates are computed through BYN. Never store a non-BYN target rate.
+- Cross rates are computed through BYN. Never store a rate whose target
+  currency is not BYN — the database enforces this with a CHECK constraint.
 
 ## Errors
 
@@ -111,33 +127,51 @@ Do not propose an alternative aesthetic. The direction is fixed.
 - Required coverage (NFR-4.3): balance calculation, category aggregation,
   budget usage, currency conversion and rounding, transfer invariants,
   ownership checks.
-- `pnpm run test` and `pnpm run lint` must pass before a pull request is opened.
+- Run `pnpm lint` and `pnpm test` yourself before reporting a task as done,
+  and report the actual output — never claim a check passed without running it.
+- **Never modify, weaken, skip or delete an existing test to make a failing
+  check pass.** If a test fails, fix the code. If you believe the test itself
+  is wrong, stop and tell me — do not change it on your own.
 
 ## Commands
 
 ```bash
-pnpm run dev              # dev server
-pnpm run test             # vitest
-pnpm run lint             # eslint + tsc --noEmit
-pnpm run db:up            # docker compose up -d postgres
-pnpm run db:migrate       # prisma migrate dev
-pnpm run db:seed          # demo data
-pnpm run db:studio        # prisma studio
+pnpm dev              # dev server
+pnpm test             # vitest
+pnpm lint             # eslint + tsc --noEmit
+pnpm db:up            # docker compose up -d postgres
+pnpm db:migrate       # prisma migrate dev
+pnpm db:seed          # demo data
+pnpm db:studio        # prisma studio
 ```
 
 ## Git
 
 - One vertical slice per branch, one branch per pull request.
 - Conventional commits: `feat:`, `fix:`, `chore:`, `test:`, `docs:`.
+- One line, no body. If a change needs explaining, it belongs in `docs/`.
 - Commit messages, code, identifiers and comments are English. UI copy is
   Russian and English via `messages/`.
 - Squash and merge into `main`. Never push to `main` directly.
 
+## Progress tracking
+
+`docs/tasks.md` is the project's progress tracker.
+
+- At the start of a session, if I don't name a task, read `docs/tasks.md`
+  and tell me which task is next. Do not start it without confirmation.
+- When a task is finished, tick its status line in the same commit.
+- Never tick a task you have not actually completed and verified.
+
 ## Working style
 
+- Talk to me in Russian. Code, identifiers, comments, commit messages and
+  documentation stay English.
 - Before a task, state in one or two sentences what you are going to change
   and which files it touches. Wait for confirmation on anything that touches
   the schema, auth, or the money path.
+- No comments in code, including configuration files. Names and structure carry
+  the meaning; reasoning belongs in `docs/`.
 - Change only what the task asks for. Do not refactor adjacent code, do not
   reformat untouched files, do not "improve" things nobody asked about.
 - When a requirement and the existing code disagree, stop and say so instead
@@ -145,10 +179,12 @@ pnpm run db:studio        # prisma studio
 - Never write a migration that drops a column or table without saying so
   explicitly first.
 - Never commit `.env`, secrets, or generated files.
+- If something cannot be done as specified, say so plainly. Do not work
+  around a rule in this file without telling me.
 
 ## Definition of done
 
 A pull request is finished when: types pass, lint passes, tests pass, new
 services have tests, both locale files are updated, empty and loading and
-error states exist for any new list, and the referenced FR numbers are
-satisfied.
+error states exist for any new list, the task's status line is ticked, and
+the referenced FR numbers are satisfied.
