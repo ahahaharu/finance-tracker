@@ -138,7 +138,7 @@ erDiagram
 | Поле | Тип | Обяз. | По умолчанию | Примечания |
 |---|---|:--:|---|---|
 | `id` | `text` | да | `cuid()` | первичный ключ |
-| `email` | `citext` | да | — | уникально, хранится в нижнем регистре |
+| `email` | `text` | да | — | уникален без учёта регистра |
 | `passwordHash` | `text` | да | — | bcrypt, cost 12 (FR-1.2) |
 | `name` | `varchar(80)` | да | — | отображаемое имя |
 | `role` | `Role` | да | `USER` | FR-1.4 |
@@ -148,11 +148,18 @@ erDiagram
 | `createdAt` | `timestamptz` | да | `now()` | |
 | `updatedAt` | `timestamptz` | да | авто | |
 
-Ограничения: `UNIQUE(email)`.
+Ограничения: `UNIQUE(email)`, `UNIQUE(lower(email))`.
 
-Расширение `citext` включается отдельной миграцией. Альтернатива — приводить
-адрес к нижнему регистру в приложении; расширение надёжнее, потому что
-не зависит от того, все ли пути записи об этом помнят.
+Регистронезависимость обеспечивает функциональный уникальный индекс
+`CREATE UNIQUE INDEX ON "User" (lower("email"))`, добавляемый отдельной
+миграцией. Обычный `UNIQUE(email)` при этом сохраняется: он не даёт
+регистронезависимой гарантии, но нужен Prisma для `findUnique` по адресу.
+
+Рассмотрен и отклонён вариант с типом `citext`: он требует расширения СУБД,
+которое пришлось бы включать и на рабочей базе, тогда как функциональный
+индекс работает на любом PostgreSQL. Приведение адреса к нижнему регистру
+только в приложении отклонено — оно зависит от того, все ли пути записи
+об этом помнят.
 
 ### 4.2. Wallet
 
@@ -168,7 +175,9 @@ erDiagram
 | `updatedAt` | `timestamptz` | да | авто | |
 
 Ограничения: `UNIQUE(userId, name)` (FR-2.7).
-Индексы: `INDEX(userId)`.
+Индексы: отдельный `INDEX(userId)` не создаётся — `userId` является ведущим
+столбцом уникального индекса выше, и выборка счетов пользователя обслуживается
+им же.
 
 Текущий остаток в таблице **не хранится** (FR-2.5) — вычисляется агрегатом.
 
@@ -186,7 +195,8 @@ erDiagram
 | `updatedAt` | `timestamptz` | да | авто | |
 
 Ограничения: `UNIQUE(userId, kind, name)` (FR-3.5).
-Индексы: `INDEX(userId, kind)`.
+Индексы: отдельный `INDEX(userId, kind)` не создаётся — эта пара является
+префиксом уникального индекса выше.
 
 ### 4.4. Transaction
 
@@ -222,17 +232,17 @@ INDEX(transferGroupId)             -- удаление и просмотр пе�
 
 ```sql
 ALTER TABLE "Transaction"
-  ADD CONSTRAINT amount_positive CHECK ("amount" > 0),
+  ADD CONSTRAINT transaction_amount_positive CHECK ("amount" > 0),
 
-  ADD CONSTRAINT rate_positive CHECK ("rate" > 0),
+  ADD CONSTRAINT transaction_rate_positive CHECK ("rate" > 0),
 
-  ADD CONSTRAINT category_matches_type CHECK (
+  ADD CONSTRAINT transaction_category_matches_type CHECK (
     ("type" IN ('INCOME','EXPENSE') AND "categoryId" IS NOT NULL)
     OR
     ("type" IN ('TRANSFER_IN','TRANSFER_OUT') AND "categoryId" IS NULL)
   ),
 
-  ADD CONSTRAINT transfer_has_group CHECK (
+  ADD CONSTRAINT transaction_transfer_has_group CHECK (
     ("type" IN ('TRANSFER_IN','TRANSFER_OUT')) = ("transferGroupId" IS NOT NULL)
   );
 ```
@@ -269,7 +279,9 @@ ALTER TABLE "Transaction"
 | `rate` | `numeric(18,8)` | да | — | 1 единица `from` = `rate` единиц `to` |
 | `fetchedAt` | `timestamptz` | да | `now()` | момент загрузки |
 
-Ограничения: `UNIQUE(date, fromCurrency, toCurrency)`, `CHECK (rate > 0)`.
+Ограничения: `UNIQUE(date, fromCurrency, toCurrency)`, `CHECK (rate > 0)`,
+`CHECK (toCurrency = 'BYN')` — правило раздела 5.4 обеспечивается СУБД,
+а не только сервисным слоем.
 Индексы: `INDEX(fromCurrency, toCurrency, date DESC)` — обслуживает поиск
 ближайшего предшествующего курса (FR-7.5).
 
