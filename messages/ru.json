@@ -1,0 +1,99 @@
+{
+  "app": {
+    "title": "finance-tracker",
+    "description": "Учёт личных финансов"
+  },
+  "theme": {
+    "toggle": "Переключить тему"
+  },
+  "locale": {
+    "switchTo": "Переключить на {language}",
+    "ru": "RU",
+    "en": "EN",
+    "languageNames": {
+      "ru": "русский",
+      "en": "английский"
+    }
+  },
+  "budget": {
+    "withinLimit": "в норме",
+    "nearLimit": "на пределе",
+    "exceeded": "превышен"
+  },
+  "showcase": {
+    "title": "Дизайн-система",
+    "sections": {
+      "tokens": "Служебные токены",
+      "categories": "Палитра категорий",
+      "typography": "Типографика",
+      "buttons": "Кнопки",
+      "inputs": "Поля ввода",
+      "transactions": "Операции",
+      "amounts": "Суммы",
+      "budgets": "Бюджеты",
+      "empty": "Пустое состояние",
+      "loading": "Загрузка"
+    },
+    "categories": {
+      "groceries": "Продукты",
+      "transport": "Транспорт",
+      "housing": "Жильё",
+      "health": "Здоровье",
+      "entertainment": "Развлечения",
+      "education": "Образование",
+      "clothing": "Одежда",
+      "cafe": "Кафе",
+      "communication": "Связь",
+      "gifts": "Подарки",
+      "sport": "Спорт",
+      "other": "Прочее"
+    },
+    "typography": {
+      "micro": "11 — мелкие метки и статусы",
+      "caption": "12 — подписи и метаданные",
+      "body": "13 — интерфейсный текст",
+      "emphasis": "14 — акцентированный текст",
+      "heading": "20 — заголовок страницы",
+      "amount": "32 — крупные суммы",
+      "hero": "44 — общий баланс"
+    },
+    "buttons": {
+      "primary": "Добавить операцию",
+      "secondary": "Отмена",
+      "ghost": "Сбросить фильтры",
+      "destructive": "Удалить",
+      "disabled": "Недоступно"
+    },
+    "inputs": {
+      "nameLabel": "Наименование",
+      "namePlaceholder": "Наличные",
+      "openingBalanceLabel": "Начальный остаток",
+      "openingBalanceValue": "0,00",
+      "openingBalanceError": "Введите сумму больше нуля",
+      "accountLabel": "Счёт",
+      "accountPlaceholder": "Выберите счёт"
+    },
+    "accounts": {
+      "cash": "Наличные",
+      "card": "Карта БПС",
+      "savings": "Накопления"
+    },
+    "table": {
+      "time": "Время",
+      "description": "Описание",
+      "category": "Категория",
+      "account": "Счёт",
+      "amount": "Сумма",
+      "filterTotal": "Итого по фильтру"
+    },
+    "transactions": {
+      "coffee": "Кофе на вынос",
+      "groceries": "Продукты на неделю",
+      "salary": "Зарплата за июль",
+      "subscription": "Подписка на сервис"
+    },
+    "totalBalance": "Общий баланс",
+    "emptyMessage": "За выбранный период операций нет.",
+    "emptyAction": "Сбросить фильтры"
+  }
+}

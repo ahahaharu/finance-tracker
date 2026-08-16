@@ -1,3 +1,5 @@
+import { useLocale } from "next-intl";
+
 import type { Currency, TransactionType } from "@/lib/generated/prisma/enums";
 import { formatMoney } from "@/lib/format/money";
 import { cn } from "@/lib/utils";
@@ -10,7 +12,6 @@ type AmountProps = {
   type?: AmountKind;
   baseMinor?: number;
   baseCurrency?: Currency;
-  locale?: string;
   size?: "default" | "large" | "hero";
   className?: string;
 };
@@ -30,10 +31,10 @@ function Amount({
   type,
   baseMinor,
   baseCurrency,
-  locale = "ru",
   size = "default",
   className,
 }: AmountProps) {
+  const locale = useLocale();
   const value = type === undefined ? minor : Math.abs(minor);
 
   let sign = "";

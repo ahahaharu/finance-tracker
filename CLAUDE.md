@@ -51,8 +51,13 @@ lib/repositories/**     The only place allowed to call prisma.*
 lib/schemas/**          Zod schemas — shared by API, actions and forms.
 lib/auth/**             Auth.js config, session helpers, guards.
 prisma/                 schema.prisma, migrations, seed.ts
+i18n/                   next-intl routing, request config, navigation helpers
 messages/               ru.json, en.json
+proxy.ts                locale routing and unauthenticated redirects
 ```
+
+In Next.js 16 the `middleware.ts` convention is deprecated and renamed to
+`proxy.ts`. Use `proxy.ts`.
 
 ### Hard rules
 
@@ -62,8 +67,8 @@ messages/               ru.json, en.json
 2. `prisma.*` is called only from `lib/repositories/`. Anywhere else is a
    review failure.
 3. Every service that reads or writes user-owned data checks ownership as its
-   first statement (NFR-1.1). Never rely on middleware for authorization —
-   middleware only redirects unauthenticated visitors.
+   first statement (NFR-1.1). Never rely on `proxy.ts` for authorization —
+   it only redirects unauthenticated visitors.
 4. Every admin service checks the role explicitly (NFR-1.2).
 5. Server actions call services directly. They must never `fetch()` the app's
    own REST API.

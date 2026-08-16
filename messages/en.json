@@ -1,0 +1,99 @@
+{
+  "app": {
+    "title": "finance-tracker",
+    "description": "Personal finance tracker"
+  },
+  "theme": {
+    "toggle": "Toggle theme"
+  },
+  "locale": {
+    "switchTo": "Switch to {language}",
+    "ru": "RU",
+    "en": "EN",
+    "languageNames": {
+      "ru": "Russian",
+      "en": "English"
+    }
+  },
+  "budget": {
+    "withinLimit": "on track",
+    "nearLimit": "near limit",
+    "exceeded": "exceeded"
+  },
+  "showcase": {
+    "title": "Design system",
+    "sections": {
+      "tokens": "Surface tokens",
+      "categories": "Category palette",
+      "typography": "Typography",
+      "buttons": "Buttons",
+      "inputs": "Form fields",
+      "transactions": "Transactions",
+      "amounts": "Amounts",
+      "budgets": "Budgets",
+      "empty": "Empty state",
+      "loading": "Loading"
+    },
+    "categories": {
+      "groceries": "Groceries",
+      "transport": "Transport",
+      "housing": "Housing",
+      "health": "Health",
+      "entertainment": "Entertainment",
+      "education": "Education",
+      "clothing": "Clothing",
+      "cafe": "Cafe",
+      "communication": "Communication",
+      "gifts": "Gifts",
+      "sport": "Sport",
+      "other": "Other"
+    },
+    "typography": {
+      "micro": "11 — small labels and statuses",
+      "caption": "12 — captions and metadata",
+      "body": "13 — interface text",
+      "emphasis": "14 — emphasised text",
+      "heading": "20 — page heading",
+      "amount": "32 — large amounts",
+      "hero": "44 — total balance"
+    },
+    "buttons": {
+      "primary": "Add transaction",
+      "secondary": "Cancel",
+      "ghost": "Reset filters",
+      "destructive": "Delete",
+      "disabled": "Unavailable"
+    },
+    "inputs": {
+      "nameLabel": "Name",
+      "namePlaceholder": "Cash",
+      "openingBalanceLabel": "Opening balance",
+      "openingBalanceValue": "0.00",
+      "openingBalanceError": "Enter an amount greater than zero",
+      "accountLabel": "Account",
+      "accountPlaceholder": "Select an account"
+    },
+    "accounts": {
+      "cash": "Cash",
+      "card": "BPS card",
+      "savings": "Savings"
+    },
+    "table": {
+      "time": "Time",
+      "description": "Description",
+      "category": "Category",
+      "account": "Account",
+      "amount": "Amount",
+      "filterTotal": "Filter total"
+    },
+    "transactions": {
+      "coffee": "Coffee to go",
+      "groceries": "Weekly groceries",
+      "salary": "July salary",
+      "subscription": "Service subscription"
+    },
+    "totalBalance": "Total balance",
+    "emptyMessage": "No transactions in the selected period.",
+    "emptyAction": "Reset filters"
+  }
+}

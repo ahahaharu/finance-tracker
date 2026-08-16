@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 import { cn } from "@/lib/utils";
 
 type BudgetStatusProps = {
@@ -6,14 +8,10 @@ type BudgetStatusProps = {
 };
 
 function BudgetStatus({ ratio, className }: BudgetStatusProps) {
+  const t = useTranslations("budget");
+
   const state =
     ratio > 1 ? "exceeded" : ratio >= 0.8 ? "nearLimit" : "withinLimit";
-
-  const label = {
-    withinLimit: "в норме",
-    nearLimit: "на пределе",
-    exceeded: "превышен",
-  }[state];
 
   const toneClassName = {
     withinLimit: "bg-sunken text-ink-muted",
@@ -31,7 +29,7 @@ function BudgetStatus({ ratio, className }: BudgetStatusProps) {
         className,
       )}
     >
-      {label}
+      {t(state)}
     </span>
   );
 }

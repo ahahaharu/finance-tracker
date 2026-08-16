@@ -2,20 +2,31 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme]), :root:not([data-theme]) *) {
+      @slot;
+    }
+  }
+}
 
 :root {
-  --bg: #fbfaf8;
-  --surface: #ffffff;
-  --sunken: #f4f2ed;
-  --line: #e4e0d8;
-  --line-strong: #cfc9bd;
-  --ink: #1a1917;
-  --ink-muted: #6b665d;
-  --ink-faint: #9a948a;
-  --positive: #2f6b4f;
-  --warning: #8a6a2f;
-  --negative: #a8442a;
+  color-scheme: light dark;
+
+  --bg: light-dark(#fbfaf8, #141311);
+  --surface: light-dark(#ffffff, #1b1a17);
+  --sunken: light-dark(#f4f2ed, #100f0e);
+  --line: light-dark(#e4e0d8, #2c2a26);
+  --line-strong: light-dark(#cfc9bd, #3d3a34);
+  --ink: light-dark(#1a1917, #edeae3);
+  --ink-muted: light-dark(#6b665d, #9a948a);
+  --ink-faint: light-dark(#9a948a, #6b665d);
+  --positive: light-dark(#2f6b4f, #6fa98a);
+  --warning: light-dark(#8a6a2f, #c4a05c);
+  --negative: light-dark(#a8442a, #d98368);
   --radius: 6px;
 
   --cat-1: #8c6a4a;
@@ -51,18 +62,12 @@
   --ring: var(--ink);
 }
 
+[data-theme="light"] {
+  color-scheme: light;
+}
+
 [data-theme="dark"] {
-  --bg: #141311;
-  --surface: #1b1a17;
-  --sunken: #100f0e;
-  --line: #2c2a26;
-  --line-strong: #3d3a34;
-  --ink: #edeae3;
-  --ink-muted: #9a948a;
-  --ink-faint: #6b665d;
-  --positive: #6fa98a;
-  --warning: #c4a05c;
-  --negative: #d98368;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -160,10 +165,9 @@
   }
 
   [data-category-color] {
-    background-color: var(--dot);
-  }
-
-  [data-theme="dark"] [data-category-color] {
-    background-color: color-mix(in oklch, var(--dot) 75%, white);
+    background-color: light-dark(
+      var(--dot),
+      color-mix(in oklch, var(--dot) 75%, white)
+    );
   }
 }
