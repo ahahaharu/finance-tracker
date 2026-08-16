@@ -115,6 +115,12 @@ messages/               ru.json, en.json
 - Money renders only through `<Amount />`.
 - No pie or donut charts.
 - Animations max 150ms, `opacity` and `transform` only.
+- Category colour comes only from the fixed `--cat-1..12` palette and appears
+  only in `<CategoryDot />`, category bars and category labels — never as row
+  or card background, border or text.
+- At most one element per page sits on `--surface`.
+- Money renders only through `<Amount />`; categories only through
+  `<CategoryDot />`; budget status only through `<BudgetStatus />`.
 
 Do not propose an alternative aesthetic. The direction is fixed.
 

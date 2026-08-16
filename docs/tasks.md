@@ -49,12 +49,12 @@ pnpm, `docker-compose.yml` с PostgreSQL, `.env`, `.env.example`, `docs/`
 
 ### A3 — Дизайн-система и базовые компоненты
 
-**Статус:** `[ ]` не начата
+**Статус:** `[x]` готово
 **Дневник:** 7 · **NFR:** 3.2, 3.5 · **Оценка:** 0.5 дня
 
 CSS-переменные в `globals.css`, шрифты через `next/font`, конфигурация
 shadcn под токены, компоненты `Button`, `Input`, `Select`, `TableRow`,
-`Amount`, `EmptyState`, `Skeleton`. Переключение светлой и тёмной темы.
+`Amount`, `EmptyState`, `Skeleton`, `CategoryDot`, `BudgetStatus`. Переключение светлой и тёмной темы.
 
 Готово, когда есть страница-витрина компонентов и обе темы выглядят верно.
 
