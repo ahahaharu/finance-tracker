@@ -10,10 +10,15 @@ function ThemeToggle() {
   const t = useTranslations("theme");
 
   function toggle() {
-    const next =
-      document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    const current =
+      document.documentElement.dataset.theme ??
+      (window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light");
+    const next = current === "dark" ? "light" : "dark";
+
     document.documentElement.dataset.theme = next;
-    localStorage.setItem("theme", next);
+    document.cookie = `theme=${next};path=/;max-age=31536000;samesite=lax`;
   }
 
   return (

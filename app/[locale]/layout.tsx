@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -38,8 +39,6 @@ export async function generateMetadata({
   };
 }
 
-const themeScript = `(()=>{try{const t=localStorage.getItem("theme");const d=window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.dataset.theme=t==="light"||t==="dark"?t:d?"dark":"light"}catch{}})()`;
-
 export default async function LocaleLayout({
   children,
   params,
@@ -52,16 +51,14 @@ export default async function LocaleLayout({
 
   setRequestLocale(locale);
 
+  const theme = (await cookies()).get("theme")?.value;
+
   return (
     <html
       lang={locale}
-      data-theme="light"
+      data-theme={theme === "dark" || theme === "light" ? theme : undefined}
       className={`${plexSans.variable} ${plexMono.variable} h-full antialiased`}
-      suppressHydrationWarning
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
       <body className="flex min-h-full flex-col">
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
