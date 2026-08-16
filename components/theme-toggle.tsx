@@ -4,6 +4,7 @@ import { Moon, Sun } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
+import { Tooltip } from "@/components/ui/tooltip";
 
 function ThemeToggle() {
   const t = useTranslations("theme");
@@ -16,15 +17,17 @@ function ThemeToggle() {
   }
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={toggle}
-      aria-label={t("toggle")}
-    >
-      <Moon size={16} className="dark:hidden" />
-      <Sun size={16} className="hidden dark:block" />
-    </Button>
+    <Tooltip content={t("toggle")}>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={toggle}
+        aria-label={t("toggle")}
+      >
+        <Moon size={16} className="dark:hidden" />
+        <Sun size={16} className="hidden dark:block" />
+      </Button>
+    </Tooltip>
   );
 }
 

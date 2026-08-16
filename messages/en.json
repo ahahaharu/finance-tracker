@@ -7,9 +7,13 @@
     "toggle": "Toggle theme"
   },
   "locale": {
-    "switch": "Switch language",
+    "switchTo": "Switch to {language}",
     "ru": "RU",
-    "en": "EN"
+    "en": "EN",
+    "languageNames": {
+      "ru": "Russian",
+      "en": "English"
+    }
   },
   "budget": {
     "withinLimit": "on track",

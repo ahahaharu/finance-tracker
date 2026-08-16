@@ -7,9 +7,13 @@
     "toggle": "Переключить тему"
   },
   "locale": {
-    "switch": "Переключить язык",
+    "switchTo": "Переключить на {language}",
     "ru": "RU",
-    "en": "EN"
+    "en": "EN",
+    "languageNames": {
+      "ru": "русский",
+      "en": "английский"
+    }
   },
   "budget": {
     "withinLimit": "в норме",
