@@ -7,7 +7,6 @@ generator erd {
   provider = "prisma-erd-generator"
   output   = "../docs/erd.svg"
   theme    = "neutral"
-  mmdcPath = "node_modules/.pnpm/node_modules/.bin"
 }
 
 datasource db {
