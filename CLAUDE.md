@@ -45,6 +45,7 @@ by server components.
 ```
 app/[locale]/(app)/**   UI. Server components read via services.
                         Mutations go through server actions.
+app/[locale]/(auth)/**  Sign-in and registration screens.
 app/api/v1/**           REST route handlers (FR-11.1).
 lib/services/**         ALL business logic. Unit tests live next to it.
 lib/repositories/**     The only place allowed to call prisma.*

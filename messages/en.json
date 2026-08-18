@@ -15,6 +15,47 @@
       "en": "English"
     }
   },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "submit": "Sign in",
+      "noAccount": "No account yet?",
+      "registerLink": "Create one"
+    },
+    "register": {
+      "title": "Registration",
+      "submit": "Create account",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Sign in"
+    },
+    "fields": {
+      "name": "Name",
+      "email": "Email address",
+      "password": "Password",
+      "baseCurrency": "Reporting currency"
+    },
+    "hints": {
+      "password": "At least 8 characters, including a letter and a digit",
+      "baseCurrency": "The currency all totals are reported in. You can change it in settings"
+    },
+    "fieldErrors": {
+      "name": "Enter a name",
+      "email": "Enter a valid email address",
+      "password": "At least 8 characters, including a letter and a digit",
+      "passwordRequired": "Enter a password",
+      "baseCurrency": "Choose a reporting currency"
+    },
+    "errors": {
+      "VALIDATION_FAILED": "Check the fields above",
+      "EMAIL_TAKEN": "This address is already registered",
+      "INVALID_CREDENTIALS": "Wrong email or password"
+    },
+    "signOut": "Sign out",
+    "session": {
+      "title": "You are signed in",
+      "hint": "Wallets, transactions and analytics arrive in later tasks."
+    }
+  },
   "budget": {
     "withinLimit": "on track",
     "nearLimit": "near limit",
