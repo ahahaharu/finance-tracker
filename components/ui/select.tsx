@@ -16,6 +16,7 @@ type SelectProps = {
   label?: string;
   error?: string;
   placeholder?: string;
+  name?: string;
   value?: string | null;
   defaultValue?: string | null;
   onValueChange?: (value: string | null) => void;
@@ -28,6 +29,7 @@ function Select({
   label,
   error,
   placeholder,
+  name,
   value,
   defaultValue,
   onValueChange,
@@ -54,6 +56,7 @@ function Select({
       ) : null}
       <SelectPrimitive.Root
         items={labels}
+        name={name}
         value={value}
         defaultValue={defaultValue}
         onValueChange={onValueChange}
