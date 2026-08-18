@@ -1,15 +1,11 @@
 import type { NextAuthConfig } from "next-auth";
 import type { JWT } from "next-auth/jwt";
-import Credentials from "next-auth/providers/credentials";
 
-import { isDomainError } from "@/lib/errors";
 import type { Currency, Role } from "@/lib/generated/prisma/enums";
-import { credentialsSchema } from "@/lib/schemas/auth";
-import { authenticateUser } from "@/lib/services/auth";
 
 const THIRTY_DAYS = 30 * 24 * 60 * 60;
 
-type SessionClaims = JWT & {
+export type SessionClaims = JWT & {
   id: string;
   role: Role;
   baseCurrency: Currency;
@@ -21,31 +17,7 @@ export const authConfig: NextAuthConfig = {
     strategy: "jwt",
     maxAge: THIRTY_DAYS,
   },
-  providers: [
-    Credentials({
-      credentials: {
-        email: { type: "email" },
-        password: { type: "password" },
-      },
-      async authorize(credentials) {
-        const parsed = credentialsSchema.safeParse(credentials);
-
-        if (!parsed.success) {
-          return null;
-        }
-
-        try {
-          return await authenticateUser(parsed.data);
-        } catch (error) {
-          if (isDomainError(error)) {
-            return null;
-          }
-
-          throw error;
-        }
-      },
-    }),
-  ],
+  providers: [],
   callbacks: {
     jwt({ token, user }) {
       if (!user?.id) {

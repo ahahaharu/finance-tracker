@@ -4,7 +4,9 @@ import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { redirect } from "@/i18n/navigation";
 import { toLocale } from "@/i18n/routing";
-import { auth } from "@/lib/auth";
+import { requireUser } from "@/lib/auth/guards";
+import { isDomainError } from "@/lib/errors";
+import type { AuthenticatedUser } from "@/lib/services/auth";
 
 import { SignOutButton } from "./sign-out-button";
 
@@ -13,10 +15,16 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
 
   setRequestLocale(locale);
 
-  const session = await auth();
+  let user: AuthenticatedUser;
 
-  if (!session) {
-    return redirect({ href: "/login", locale });
+  try {
+    user = await requireUser();
+  } catch (error) {
+    if (isDomainError(error)) {
+      return redirect({ href: "/login", locale });
+    }
+
+    throw error;
   }
 
   const t = await getTranslations("auth");
@@ -33,17 +41,17 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         <dl className="mt-4 flex flex-col gap-2">
           <div className="flex gap-3">
             <dt className="w-40 text-12 text-ink-muted">{t("fields.name")}</dt>
-            <dd className="text-13">{session.user.name}</dd>
+            <dd className="text-13">{user.name}</dd>
           </div>
           <div className="flex gap-3">
             <dt className="w-40 text-12 text-ink-muted">{t("fields.email")}</dt>
-            <dd className="text-13">{session.user.email}</dd>
+            <dd className="text-13">{user.email}</dd>
           </div>
           <div className="flex gap-3">
             <dt className="w-40 text-12 text-ink-muted">
               {t("fields.baseCurrency")}
             </dt>
-            <dd className="text-13">{session.user.baseCurrency}</dd>
+            <dd className="text-13">{user.baseCurrency}</dd>
           </div>
         </dl>
         <p className="mt-6 text-12 text-ink-muted">{t("session.hint")}</p>

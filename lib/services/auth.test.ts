@@ -1,7 +1,11 @@
 import { compare, hash } from "bcryptjs";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { EmailTakenError, InvalidCredentialsError } from "@/lib/errors";
+import {
+  AccountBlockedError,
+  EmailTakenError,
+  InvalidCredentialsError,
+} from "@/lib/errors";
 import type { User } from "@/lib/generated/prisma/client";
 import type { NewUser } from "@/lib/repositories/user";
 import { authenticateUser, registerUser } from "@/lib/services/auth";
@@ -137,6 +141,26 @@ describe("authenticateUser", () => {
   it("rejects an unknown email with the same error as a wrong password", async () => {
     await expect(
       authenticateUser({ email: "nobody@example.com", password }),
+    ).rejects.toThrow(InvalidCredentialsError);
+  });
+
+  it("rejects a blocked account even when the password is correct", async () => {
+    repository.findByEmail.mockResolvedValue(
+      userFixture({ passwordHash: await hash(password, 10), isBlocked: true }),
+    );
+
+    await expect(
+      authenticateUser({ email: "anna@example.com", password }),
+    ).rejects.toThrow(AccountBlockedError);
+  });
+
+  it("does not reveal the block before the password is verified", async () => {
+    repository.findByEmail.mockResolvedValue(
+      userFixture({ passwordHash: await hash(password, 10), isBlocked: true }),
+    );
+
+    await expect(
+      authenticateUser({ email: "anna@example.com", password: "wrong8pass" }),
     ).rejects.toThrow(InvalidCredentialsError);
   });
 });

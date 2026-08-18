@@ -48,7 +48,8 @@
     "errors": {
       "VALIDATION_FAILED": "Check the fields above",
       "EMAIL_TAKEN": "This address is already registered",
-      "INVALID_CREDENTIALS": "Wrong email or password"
+      "INVALID_CREDENTIALS": "Wrong email or password",
+      "ACCOUNT_BLOCKED": "This account is blocked. Contact an administrator"
     },
     "signOut": "Sign out",
     "session": {

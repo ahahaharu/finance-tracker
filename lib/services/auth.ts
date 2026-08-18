@@ -1,7 +1,11 @@
 import type { Locale } from "next-intl";
 import { compare, hash } from "bcryptjs";
 
-import { EmailTakenError, InvalidCredentialsError } from "@/lib/errors";
+import {
+  AccountBlockedError,
+  EmailTakenError,
+  InvalidCredentialsError,
+} from "@/lib/errors";
 import type { Currency, Role } from "@/lib/generated/prisma/enums";
 import type { User } from "@/lib/generated/prisma/client";
 import { userRepository } from "@/lib/repositories/user";
@@ -19,7 +23,7 @@ export type AuthenticatedUser = {
   locale: string;
 };
 
-function toAuthenticatedUser(user: User): AuthenticatedUser {
+export function toAuthenticatedUser(user: User): AuthenticatedUser {
   return {
     id: user.id,
     email: user.email,
@@ -65,6 +69,10 @@ export async function authenticateUser(
 
   if (!matches) {
     throw new InvalidCredentialsError();
+  }
+
+  if (user.isBlocked) {
+    throw new AccountBlockedError();
   }
 
   return toAuthenticatedUser(user);

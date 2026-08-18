@@ -48,7 +48,8 @@
     "errors": {
       "VALIDATION_FAILED": "Проверьте заполненные поля",
       "EMAIL_TAKEN": "Этот адрес уже зарегистрирован",
-      "INVALID_CREDENTIALS": "Неверный адрес или пароль"
+      "INVALID_CREDENTIALS": "Неверный адрес или пароль",
+      "ACCOUNT_BLOCKED": "Учётная запись заблокирована. Обратитесь к администратору"
     },
     "signOut": "Выйти",
     "session": {

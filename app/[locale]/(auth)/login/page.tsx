@@ -2,7 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 
 import { redirect } from "@/i18n/navigation";
 import { toLocale } from "@/i18n/routing";
-import { auth } from "@/lib/auth";
+import { hasActiveUser } from "@/lib/auth/guards";
 
 import { LoginForm } from "../login-form";
 
@@ -13,7 +13,7 @@ export default async function LoginPage({
 
   setRequestLocale(locale);
 
-  if (await auth()) {
+  if (await hasActiveUser()) {
     return redirect({ href: "/", locale });
   }
 

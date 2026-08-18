@@ -1,7 +1,7 @@
 "use server";
 
 import type { Locale } from "next-intl";
-import { AuthError } from "next-auth";
+import { AuthError, CredentialsSignin } from "next-auth";
 import type { ZodError } from "zod";
 
 import { redirect } from "@/i18n/navigation";
@@ -14,6 +14,7 @@ const formErrorCodes = [
   "VALIDATION_FAILED",
   "EMAIL_TAKEN",
   "INVALID_CREDENTIALS",
+  "ACCOUNT_BLOCKED",
 ] as const;
 
 export type AuthFormErrorCode = (typeof formErrorCodes)[number];
@@ -31,13 +32,20 @@ function invalidFields(error: ZodError): string[] {
   return [...new Set(error.issues.map((issue) => String(issue.path[0])))];
 }
 
-async function signInWithCredentials(email: string, password: string) {
+async function signInWithCredentials(
+  email: string,
+  password: string,
+): Promise<AuthFormErrorCode | null> {
   try {
     await signIn("credentials", { email, password, redirect: false });
-    return true;
+    return null;
   } catch (error) {
+    if (error instanceof CredentialsSignin && error.code === "ACCOUNT_BLOCKED") {
+      return "ACCOUNT_BLOCKED";
+    }
+
     if (error instanceof AuthError) {
-      return false;
+      return "INVALID_CREDENTIALS";
     }
 
     throw error;
@@ -61,8 +69,13 @@ export async function loginAction(
     };
   }
 
-  if (!(await signInWithCredentials(parsed.data.email, parsed.data.password))) {
-    return { code: "INVALID_CREDENTIALS" };
+  const failure = await signInWithCredentials(
+    parsed.data.email,
+    parsed.data.password,
+  );
+
+  if (failure) {
+    return { code: failure };
   }
 
   return redirect({ href: "/", locale });
@@ -97,10 +110,10 @@ export async function registerAction(
     throw error;
   }
 
-  const signedIn = await signInWithCredentials(
+  const failure = await signInWithCredentials(
     parsed.data.email,
     parsed.data.password,
   );
 
-  return redirect({ href: signedIn ? "/" : "/login", locale });
+  return redirect({ href: failure ? "/login" : "/", locale });
 }
