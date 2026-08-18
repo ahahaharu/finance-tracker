@@ -50,6 +50,30 @@ export class InvalidCredentialsError extends DomainError {
   }
 }
 
+export class AccountBlockedError extends DomainError {
+  constructor() {
+    super("ACCOUNT_BLOCKED", "Account is blocked");
+  }
+}
+
+export class UnauthenticatedError extends DomainError {
+  constructor() {
+    super("UNAUTHENTICATED", "No active session");
+  }
+}
+
+export class ForbiddenError extends DomainError {
+  constructor() {
+    super("FORBIDDEN", "Insufficient role for this action");
+  }
+}
+
+export class NotFoundError extends DomainError {
+  constructor() {
+    super("NOT_FOUND", "Resource does not exist or belongs to another user");
+  }
+}
+
 export function isDomainError(error: unknown): error is DomainError {
   return error instanceof DomainError;
 }
