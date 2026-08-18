@@ -36,7 +36,7 @@
     },
     "hints": {
       "password": "At least 8 characters, including a letter and a digit",
-      "baseCurrency": "Set at registration and cannot be changed later"
+      "baseCurrency": "The currency all totals are reported in. You can change it in settings"
     },
     "fieldErrors": {
       "name": "Enter a name",
