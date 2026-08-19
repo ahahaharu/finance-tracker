@@ -176,6 +176,7 @@
   },
   "transactions": {
     "title": "Transactions",
+    "addTransfer": "Transfer",
     "empty": "No transactions yet. The first one shows up here right after you add it.",
     "needsWalletAndCategory": "Adding a transaction needs at least one wallet and one category.",
     "noNote": "No note",
@@ -263,6 +264,52 @@
       "RATE_NOT_AVAILABLE": "No rate for this date or earlier — load the rates first",
       "NOT_FOUND": "Transaction not found",
       "unexpected": "Transactions could not be loaded"
+    }
+  },
+  "transfers": {
+    "title": "New transfer",
+    "detailsTitle": "Transfer",
+    "needsTwoWallets": "A transfer needs at least two wallets.",
+    "editHint": "A transfer is not editable: delete it and create it anew.",
+    "fields": {
+      "from": "From wallet",
+      "to": "To wallet",
+      "amount": "Amount",
+      "amountFromIn": "Debited, {currency}",
+      "amountToIn": "Credited, {currency}",
+      "rate": "Transfer rate",
+      "occurredAt": "Date and time",
+      "note": "Note"
+    },
+    "placeholders": {
+      "amount": "0.00",
+      "note": "To savings"
+    },
+    "hints": {
+      "crossCurrency": "The wallets differ in currency — enter both amounts, the rate is their ratio"
+    },
+    "fieldErrors": {
+      "wallet": "Select a wallet",
+      "amount": "Enter an amount greater than zero",
+      "amountTo": "Enter the credited amount",
+      "occurredAt": "Enter a date and time",
+      "note": "No longer than 500 characters"
+    },
+    "form": {
+      "create": "Create transfer",
+      "cancel": "Cancel"
+    },
+    "actions": {
+      "delete": "Delete transfer",
+      "confirmDelete": "Confirm",
+      "cancel": "Cancel"
+    },
+    "errors": {
+      "VALIDATION_FAILED": "Check the fields above",
+      "SAME_WALLET_TRANSFER": "Source and target wallets must differ",
+      "FUTURE_DATE": "A transfer cannot be dated in the future",
+      "RATE_NOT_AVAILABLE": "No rate for this date or earlier — load the rates first",
+      "NOT_FOUND": "Transfer not found"
     }
   },
   "budget": {

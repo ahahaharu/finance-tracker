@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 
 import { deleteTransactionAction, updateTransactionAction } from "../actions";
 import { TransactionForm } from "../transaction-form";
+import { TransferDetails } from "../transfer-details";
 
 const rateDateFormat = { day: "numeric", month: "long", year: "numeric" } as const;
 
@@ -40,6 +41,17 @@ export default async function TransactionPage({
     }
 
     throw error;
+  }
+
+  if (transaction.transferGroupId !== null) {
+    return (
+      <TransferDetails
+        groupId={transaction.transferGroupId}
+        locale={locale}
+        userId={user.id}
+        baseCurrency={user.baseCurrency}
+      />
+    );
   }
 
   const [wallets, categories, t, formatter] = await Promise.all([

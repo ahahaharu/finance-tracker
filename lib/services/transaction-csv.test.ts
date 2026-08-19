@@ -15,6 +15,7 @@ function view(overrides: Partial<TransactionView> = {}): TransactionView {
     rateDate: new Date("2026-08-18T00:00:00.000Z"),
     occurredAt: new Date("2026-08-18T09:05:00"),
     note: null,
+    transferGroupId: null,
     wallet: { id: "wal_1", name: "Наличные" },
     category: { id: "cat_1", name: "Продукты", color: "#8c6a4a" },
     ...overrides,
