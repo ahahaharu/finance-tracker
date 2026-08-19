@@ -108,6 +108,18 @@ export class FutureDateError extends DomainError {
   }
 }
 
+export class ValidationFailedError extends DomainError {
+  constructor(details?: Record<string, unknown>) {
+    super("VALIDATION_FAILED", "Request payload failed validation", details);
+  }
+}
+
+export class SameWalletTransferError extends DomainError {
+  constructor() {
+    super("SAME_WALLET_TRANSFER", "Source and target wallets are the same");
+  }
+}
+
 export class RateNotAvailableError extends DomainError {
   constructor() {
     super("RATE_NOT_AVAILABLE", "No exchange rate for this date or earlier");

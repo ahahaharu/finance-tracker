@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 
 import { Amount } from "@/components/ui/amount";
+import { buttonVariants } from "@/components/ui/button";
 import { CategoryDot } from "@/components/ui/category-dot";
 import { EmptyState } from "@/components/ui/empty-state";
 import {
@@ -135,7 +136,15 @@ export default async function TransactionsPage({
 
   return (
     <div className="flex flex-col gap-section">
-      <h1 className="text-20 font-medium">{t("title")}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-20 font-medium">{t("title")}</h1>
+        <Link
+          href="/transactions/transfer"
+          className={buttonVariants({ variant: "secondary" })}
+        >
+          {t("addTransfer")}
+        </Link>
+      </div>
 
       {wallets.items.length === 0 || categories.items.length === 0 ? (
         <p className="text-13 text-ink-muted">{t("needsWalletAndCategory")}</p>

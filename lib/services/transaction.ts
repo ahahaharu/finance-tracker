@@ -36,6 +36,7 @@ export type TransactionView = {
   rateDate: Date;
   occurredAt: Date;
   note: string | null;
+  transferGroupId: string | null;
   wallet: { id: string; name: string };
   category: { id: string; name: string; color: string } | null;
 };
@@ -79,6 +80,7 @@ function toView(
     rateDate: record.rateDate,
     occurredAt: record.occurredAt,
     note: record.note,
+    transferGroupId: record.transferGroupId,
     wallet: { id: record.wallet.id, name: record.wallet.name },
     category: record.category
       ? {

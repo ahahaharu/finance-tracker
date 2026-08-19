@@ -10,7 +10,7 @@ import {
 
 export const RATE_PRECISION = 8;
 
-const RATE_UNIT = 10n ** BigInt(RATE_PRECISION);
+export const RATE_UNIT = 10n ** BigInt(RATE_PRECISION);
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
 const BASE_CURRENCY: Currency = "BYN";
 const trackedCurrencies: readonly Currency[] = ["USD", "EUR"];
