@@ -9,6 +9,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableGroupRow,
   TableHead,
   TableHeader,
@@ -24,8 +25,18 @@ import {
   type TransactionView,
 } from "@/lib/services/transaction";
 import { balanceOptions, listWallets } from "@/lib/services/wallet";
+import {
+  collectionQuerySchema,
+  DEFAULT_PAGE_SIZE,
+  type CollectionQuery,
+} from "@/lib/schemas/collection";
+import {
+  transactionFilterSchema,
+  type TransactionFilterInput,
+} from "@/lib/schemas/transaction";
 
 import { createTransactionAction } from "./actions";
+import { FilterBar } from "./filter-bar";
 import { TransactionForm } from "./transaction-form";
 
 const dayFormat = { day: "numeric", month: "long" } as const;
@@ -41,6 +52,48 @@ function groupByDay(items: readonly TransactionView[]) {
   }
 
   return [...days.entries()];
+}
+
+type SearchParams = Record<string, string | string[] | undefined>;
+
+function readFilter(query: SearchParams): TransactionFilterInput {
+  const parsed = transactionFilterSchema.safeParse(query);
+
+  return parsed.success ? parsed.data : { sort: "occurredAt:desc" };
+}
+
+function readPage(query: SearchParams): CollectionQuery {
+  const parsed = collectionQuerySchema.safeParse(query);
+
+  return parsed.success ? parsed.data : { page: 1, pageSize: DEFAULT_PAGE_SIZE };
+}
+
+function toQueryString(filter: TransactionFilterInput): string {
+  const parameters = new URLSearchParams();
+
+  if (filter.from) parameters.set("from", filter.from);
+  if (filter.to) parameters.set("to", filter.to);
+  if (filter.type) parameters.set("type", filter.type);
+  if (filter.q) parameters.set("q", filter.q);
+  if (filter.sort !== "occurredAt:desc") parameters.set("sort", filter.sort);
+
+  for (const walletId of filter.walletId ?? []) {
+    parameters.append("walletId", walletId);
+  }
+
+  for (const categoryId of filter.categoryId ?? []) {
+    parameters.append("categoryId", categoryId);
+  }
+
+  return parameters.toString();
+}
+
+function pageHref(filterQuery: string, page: number): string {
+  const parameters = new URLSearchParams(filterQuery);
+
+  parameters.set("page", String(page));
+
+  return `/transactions?${parameters.toString()}`;
 }
 
 function dayTotal(items: readonly TransactionView[]): number {
@@ -62,18 +115,23 @@ export default async function TransactionsPage({
   setRequestLocale(locale);
 
   const user = await requireUser();
-  const [{ items }, wallets, categories, query, t, formatter] =
+  const query = await searchParams;
+  const filter = readFilter(query);
+  const page = readPage(query);
+
+  const [{ items, total, totals }, wallets, categories, t, formatter] =
     await Promise.all([
-      listTransactions(user.id, transactionContext(user)),
+      listTransactions(user.id, transactionContext(user), page, filter),
       listWallets(user.id, balanceOptions(user)),
       listCategories(user.id),
-      searchParams,
       getTranslations("transactions"),
       getFormatter(),
     ]);
 
   const failed = query.error !== undefined;
   const days = groupByDay(items);
+  const totalPages = Math.max(1, Math.ceil(total / page.pageSize));
+  const filterQuery = toQueryString(filter);
 
   return (
     <div className="flex flex-col gap-section">
@@ -94,6 +152,14 @@ export default async function TransactionsPage({
       {failed ? (
         <p className="text-12 text-negative">{t("errors.NOT_FOUND")}</p>
       ) : null}
+
+      <FilterBar
+        filter={filter}
+        wallets={wallets.items}
+        categories={categories.items}
+        action={`/${locale}/transactions`}
+        exportHref={`/api/v1/transactions/export${filterQuery ? `?${filterQuery}` : ""}`}
+      />
 
       {items.length === 0 ? (
         <EmptyState message={t("empty")} />
@@ -166,8 +232,57 @@ export default async function TransactionsPage({
               </Fragment>
             ))}
           </TableBody>
+          <TableFooter>
+            <TableRow className="hover:bg-sunken">
+              <TableCell colSpan={2} className="text-12 text-ink-muted">
+                {t("totals.label", { count: total })}
+              </TableCell>
+              <TableCell className="text-12 text-ink-muted">
+                {t("totals.income")}{" "}
+                <Amount minor={totals.income} currency={totals.currency} />
+              </TableCell>
+              <TableCell className="text-12 text-ink-muted">
+                {t("totals.expense")}{" "}
+                <Amount minor={totals.expense} currency={totals.currency} />
+              </TableCell>
+              <TableCell className="text-right">
+                <Amount
+                  minor={totals.net}
+                  currency={totals.currency}
+                  type="NET"
+                />
+              </TableCell>
+            </TableRow>
+          </TableFooter>
         </Table>
       )}
+
+      {totalPages > 1 ? (
+        <nav className="flex items-center gap-3 text-12 text-ink-muted">
+          {page.page > 1 ? (
+            <Link
+              href={pageHref(filterQuery, page.page - 1)}
+              className="text-ink underline underline-offset-2"
+            >
+              {t("pagination.previous")}
+            </Link>
+          ) : null}
+          <span>
+            {t("pagination.position", {
+              page: page.page,
+              totalPages,
+            })}
+          </span>
+          {page.page < totalPages ? (
+            <Link
+              href={pageHref(filterQuery, page.page + 1)}
+              className="text-ink underline underline-offset-2"
+            >
+              {t("pagination.next")}
+            </Link>
+          ) : null}
+        </nav>
+      ) : null}
     </div>
   );
 }

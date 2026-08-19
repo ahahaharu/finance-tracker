@@ -1,3 +1,5 @@
+import { endOfDay, startOfDay } from "date-fns";
+
 import {
   CategoryKindMismatchError,
   FutureDateError,
@@ -7,14 +9,17 @@ import type { Category, Wallet } from "@/lib/generated/prisma/client";
 import type { Currency, TransactionType } from "@/lib/generated/prisma/enums";
 import { categoryRepository } from "@/lib/repositories/category";
 import {
+  type TransactionFilter,
   type TransactionRecord,
   transactionRepository,
+  type TypeTotal,
 } from "@/lib/repositories/transaction";
 import { walletRepository } from "@/lib/repositories/wallet";
 import type { CollectionQuery } from "@/lib/schemas/collection";
 import type {
   CreateTransactionInput,
   EntryType,
+  TransactionFilterInput,
   UpdateTransactionInput,
 } from "@/lib/schemas/transaction";
 import { assertOwnership } from "@/lib/services/access";
@@ -35,9 +40,17 @@ export type TransactionView = {
   category: { id: string; name: string; color: string } | null;
 };
 
+export type TransactionTotals = {
+  income: number;
+  expense: number;
+  net: number;
+  currency: Currency;
+};
+
 export type TransactionList = {
   items: TransactionView[];
   total: number;
+  totals: TransactionTotals;
 };
 
 export type TransactionContext = {
@@ -132,25 +145,81 @@ async function ownedEntry(
   return { ...record, categoryId: record.categoryId };
 }
 
+const transferTypes: readonly TransactionType[] = [
+  "TRANSFER_IN",
+  "TRANSFER_OUT",
+];
+
+export function toRepositoryFilter(
+  filter: TransactionFilterInput = { sort: "occurredAt:desc" },
+): TransactionFilter {
+  return {
+    from: filter.from ? startOfDay(new Date(`${filter.from}T00:00:00`)) : undefined,
+    to: filter.to ? endOfDay(new Date(`${filter.to}T00:00:00`)) : undefined,
+    walletIds: filter.walletId,
+    categoryIds: filter.categoryId,
+    types:
+      filter.type === undefined
+        ? undefined
+        : filter.type === "TRANSFER"
+          ? transferTypes
+          : [filter.type],
+    query: filter.q,
+    ascending: filter.sort === "occurredAt:asc",
+  };
+}
+
+export function summarise(
+  totals: readonly TypeTotal[],
+  baseCurrency: Currency,
+): TransactionTotals {
+  const of = (type: TransactionType) =>
+    totals.find((total) => total.type === type)?.total ?? 0;
+
+  const income = of("INCOME");
+  const expense = of("EXPENSE");
+
+  return { income, expense, net: income - expense, currency: baseCurrency };
+}
+
 export async function listTransactions(
   userId: string,
   context: TransactionContext,
   page?: CollectionQuery,
+  filter?: TransactionFilterInput,
 ): Promise<TransactionList> {
-  const [records, total] = await Promise.all([
+  const where = toRepositoryFilter(filter);
+
+  const [records, total, totals] = await Promise.all([
     transactionRepository.listByUser(
       userId,
+      where,
       page
         ? { skip: (page.page - 1) * page.pageSize, take: page.pageSize }
         : undefined,
     ),
-    transactionRepository.countByUser(userId),
+    transactionRepository.countByUser(userId, where),
+    transactionRepository.sumBaseAmountsByType(userId, where),
   ]);
 
   return {
     items: records.map((record) => toView(record, context.baseCurrency)),
     total,
+    totals: summarise(totals, context.baseCurrency),
   };
+}
+
+export async function listAllTransactions(
+  userId: string,
+  context: TransactionContext,
+  filter?: TransactionFilterInput,
+): Promise<TransactionView[]> {
+  const records = await transactionRepository.listByUser(
+    userId,
+    toRepositoryFilter(filter),
+  );
+
+  return records.map((record) => toView(record, context.baseCurrency));
 }
 
 export async function getTransaction(

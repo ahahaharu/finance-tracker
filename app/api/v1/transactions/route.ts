@@ -8,9 +8,13 @@ import {
   readJson,
   validationFailure,
 } from "@/lib/api/response";
+import { readSearchParams } from "@/lib/api/query";
 import { requireUser } from "@/lib/auth/guards";
 import { buildMeta, collectionQuerySchema } from "@/lib/schemas/collection";
-import { createTransactionSchema } from "@/lib/schemas/transaction";
+import {
+  createTransactionSchema,
+  transactionFilterSchema,
+} from "@/lib/schemas/transaction";
 import {
   createTransaction,
   listTransactions,
@@ -20,21 +24,29 @@ import {
 export function GET(request: NextRequest) {
   return handle(async () => {
     const user = await requireUser();
-    const query = collectionQuerySchema.safeParse(
-      Object.fromEntries(request.nextUrl.searchParams),
+    const parameters = request.nextUrl.searchParams;
+    const page = collectionQuerySchema.safeParse(
+      Object.fromEntries(parameters),
     );
 
-    if (!query.success) {
-      return validationFailure(query.error);
+    if (!page.success) {
+      return validationFailure(page.error);
     }
 
-    const { items, total } = await listTransactions(
+    const filter = transactionFilterSchema.safeParse(readSearchParams(parameters, ["walletId", "categoryId"]));
+
+    if (!filter.success) {
+      return validationFailure(filter.error);
+    }
+
+    const { items, total, totals } = await listTransactions(
       user.id,
       transactionContext(user),
-      query.data,
+      page.data,
+      filter.data,
     );
 
-    return collection(items, buildMeta(query.data, total));
+    return collection(items, { ...buildMeta(page.data, total), totals });
   });
 }
 

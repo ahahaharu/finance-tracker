@@ -23,6 +23,7 @@ import {
 const transactions = vi.hoisted(() => ({
   listByUser: vi.fn(),
   countByUser: vi.fn(),
+  sumBaseAmountsByType: vi.fn(),
   findById: vi.fn(),
   create: vi.fn(),
   update: vi.fn(),
@@ -147,6 +148,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   transactions.listByUser.mockResolvedValue([recordFixture()]);
   transactions.countByUser.mockResolvedValue(1);
+  transactions.sumBaseAmountsByType.mockResolvedValue([]);
   transactions.findById.mockResolvedValue(recordFixture());
   transactions.create.mockImplementation((data: NewTransaction) =>
     Promise.resolve(
@@ -475,10 +477,11 @@ describe("listTransactions and getTransaction", () => {
   it("translates a page into skip and take", async () => {
     await listTransactions(OWNER, IN_BYN, { page: 2, pageSize: 50 });
 
-    expect(transactions.listByUser).toHaveBeenCalledWith(OWNER, {
-      skip: 50,
-      take: 50,
-    });
+    expect(transactions.listByUser).toHaveBeenCalledWith(
+      OWNER,
+      expect.anything(),
+      { skip: 50, take: 50 },
+    );
   });
 
   it("refuses a transaction of another user", async () => {
