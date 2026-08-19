@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { addMonths, format } from "date-fns";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 
 import { buttonVariants } from "@/components/ui/button";
@@ -8,28 +7,10 @@ import { Link } from "@/i18n/navigation";
 import { toLocale } from "@/i18n/routing";
 import { monthRange } from "@/lib/services/budget";
 
+import { readMonth, shiftMonth, single } from "../month";
 import { BudgetsList } from "./budgets-list";
 
-type SearchParams = Record<string, string | string[] | undefined>;
-
 const monthFormat = { month: "long", year: "numeric" } as const;
-const monthPattern = /^\d{4}-(0[1-9]|1[0-2])$/;
-
-function single(value: string | string[] | undefined): string | undefined {
-  return Array.isArray(value) ? value[0] : value;
-}
-
-function readMonth(query: SearchParams): string {
-  const month = single(query.month);
-
-  return month && monthPattern.test(month)
-    ? month
-    : format(new Date(), "yyyy-MM");
-}
-
-function shiftMonth(month: string, offset: number): string {
-  return format(addMonths(monthRange(month).from, offset), "yyyy-MM");
-}
 
 export default async function BudgetsPage({
   params,

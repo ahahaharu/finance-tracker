@@ -12,14 +12,15 @@ type AmountProps = {
   type?: AmountKind;
   baseMinor?: number;
   baseCurrency?: Currency;
-  size?: "default" | "large" | "hero";
+  size?: "small" | "default" | "large" | "hero";
   className?: string;
 };
 
 const sizeClassName = {
+  small: "text-12",
   default: "text-13",
-  large: "text-32",
-  hero: "text-44",
+  large: "text-32 leading-none",
+  hero: "text-44 leading-none",
 } as const;
 
 const incoming: readonly AmountKind[] = ["INCOME", "TRANSFER_IN"];

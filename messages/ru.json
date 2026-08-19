@@ -64,6 +64,70 @@
     "transactions": "Операции",
     "budgets": "Бюджеты"
   },
+  "dashboard": {
+    "title": "Обзор",
+    "period": {
+      "label": "Период",
+      "from": "С даты",
+      "to": "По дату",
+      "apply": "Показать",
+      "jump": "Перейти к дате",
+      "current": {
+        "day": "Сегодня",
+        "month": "Этот месяц",
+        "year": "Этот год"
+      },
+      "previous": "Предыдущий",
+      "next": "Следующий",
+      "custom": "{from} — {to}"
+    },
+    "ranges": {
+      "day": "День",
+      "month": "Месяц",
+      "year": "Год",
+      "custom": "Диапазон"
+    },
+    "balance": "Общий остаток",
+    "balanceIncomplete": "Для части счетов курс не загружен — они в итог не вошли",
+    "delta": "За период",
+    "figures": {
+      "income": "Доход",
+      "expense": "Расход",
+      "net": "Сальдо"
+    },
+    "sections": {
+      "wallets": "Счета",
+      "budgets": "Бюджеты",
+      "categories": "Расходы по категориям",
+      "monthly": "Динамика расходов за 6 месяцев",
+      "recent": "Последние операции"
+    },
+    "columns": {
+      "time": "Время",
+      "description": "Описание",
+      "category": "Категория",
+      "wallet": "Счёт",
+      "amount": "Сумма"
+    },
+    "noNote": "Без комментария",
+    "empty": {
+      "wallets": "Счетов пока нет — общий остаток появится после первого.",
+      "budgets": "На этот месяц бюджетов нет.",
+      "categories": "За выбранный период расходов нет.",
+      "transactions": "Операций пока нет."
+    },
+    "actions": {
+      "addWallet": "Добавить счёт",
+      "addBudget": "Добавить бюджет",
+      "addTransaction": "Добавить операцию",
+      "allTransactions": "Все операции",
+      "retry": "Повторить"
+    },
+    "percent": "{percent}%",
+    "errors": {
+      "unexpected": "Не удалось загрузить обзор"
+    }
+  },
   "wallets": {
     "title": "Счета",
     "add": "Добавить счёт",
