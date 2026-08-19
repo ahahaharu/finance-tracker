@@ -60,7 +60,8 @@
   "navigation": {
     "overview": "Обзор",
     "wallets": "Счета",
-    "categories": "Категории"
+    "categories": "Категории",
+    "transactions": "Операции"
   },
   "wallets": {
     "title": "Счета",
@@ -171,6 +172,66 @@
       "CATEGORY_HAS_TRANSACTIONS": "По категории есть операции: {count}. Сначала удалите их",
       "NOT_FOUND": "Категория не найдена",
       "unexpected": "Не удалось загрузить категории"
+    }
+  },
+  "transactions": {
+    "title": "Операции",
+    "empty": "Операций пока нет. Первая появится здесь сразу после ввода.",
+    "needsWalletAndCategory": "Чтобы вводить операции, нужен хотя бы один счёт и одна категория.",
+    "noNote": "Без комментария",
+    "types": {
+      "INCOME": "Доход",
+      "EXPENSE": "Расход"
+    },
+    "columns": {
+      "time": "Время",
+      "description": "Описание",
+      "category": "Категория",
+      "wallet": "Счёт",
+      "amount": "Сумма"
+    },
+    "fields": {
+      "type": "Тип",
+      "amount": "Сумма",
+      "wallet": "Счёт",
+      "category": "Категория",
+      "occurredAt": "Дата и время",
+      "note": "Комментарий",
+      "rate": "Курс",
+      "rateDate": "Дата курса"
+    },
+    "placeholders": {
+      "amount": "0,00",
+      "wallet": "Выберите счёт",
+      "category": "Выберите категорию",
+      "note": "Продукты на неделю"
+    },
+    "fieldErrors": {
+      "amount": "Введите сумму больше нуля, например 24,50",
+      "wallet": "Выберите счёт",
+      "category": "Выберите категорию",
+      "occurredAt": "Укажите дату и время",
+      "note": "Не длиннее 500 символов"
+    },
+    "form": {
+      "editTitle": "Операция",
+      "create": "Добавить",
+      "save": "Сохранить",
+      "cancel": "Отмена"
+    },
+    "actions": {
+      "delete": "Удалить",
+      "confirmDelete": "Подтвердить",
+      "cancel": "Отмена",
+      "retry": "Повторить"
+    },
+    "errors": {
+      "VALIDATION_FAILED": "Проверьте заполненные поля",
+      "CATEGORY_KIND_MISMATCH": "Категория не соответствует типу операции",
+      "FUTURE_DATE": "Дата операции не может быть в будущем",
+      "RATE_NOT_AVAILABLE": "На эту дату и раньше курса нет — загрузите курсы",
+      "NOT_FOUND": "Операция не найдена",
+      "unexpected": "Не удалось загрузить операции"
     }
   },
   "budget": {

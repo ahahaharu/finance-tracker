@@ -11,6 +11,7 @@ import { SignOutButton } from "./sign-out-button";
 const navigation = [
   { href: "/", key: "overview" },
   { href: "/wallets", key: "wallets" },
+  { href: "/transactions", key: "transactions" },
   { href: "/categories", key: "categories" },
 ] as const;
 
