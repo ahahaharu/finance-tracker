@@ -16,18 +16,53 @@ import { toLocale } from "@/i18n/routing";
 import { requireUser } from "@/lib/auth/guards";
 import { listWallets } from "@/lib/services/wallet";
 
+import { type WalletFormErrorCode } from "./actions";
 import { DeleteWallet } from "./delete-wallet";
+
+type SearchParams = Record<string, string | string[] | undefined>;
+
+type Failure = {
+  code: WalletFormErrorCode;
+  walletId: string;
+  count: number;
+};
+
+function single(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+const deleteErrorCodes: readonly WalletFormErrorCode[] = [
+  "WALLET_HAS_TRANSACTIONS",
+  "NOT_FOUND",
+];
+
+function readFailure(query: SearchParams): Failure | null {
+  const code = deleteErrorCodes.find((known) => known === single(query.error));
+  const walletId = single(query.walletId);
+
+  if (!code || !walletId) {
+    return null;
+  }
+
+  return { code, walletId, count: Number(single(query.count) ?? 0) };
+}
 
 export default async function WalletsPage({
   params,
+  searchParams,
 }: PageProps<"/[locale]/wallets">) {
   const locale = toLocale((await params).locale);
 
   setRequestLocale(locale);
 
   const user = await requireUser();
-  const { items } = await listWallets(user.id);
-  const t = await getTranslations("wallets");
+  const [{ items }, query, t] = await Promise.all([
+    listWallets(user.id),
+    searchParams,
+    getTranslations("wallets"),
+  ]);
+
+  const failure = readFailure(query);
 
   return (
     <div className="flex flex-col gap-section">
@@ -79,7 +114,18 @@ export default async function WalletsPage({
                   />
                 </TableCell>
                 <TableCell>
-                  <DeleteWallet walletId={wallet.id} locale={locale} />
+                  <div className="flex flex-col items-end gap-1">
+                    <DeleteWallet walletId={wallet.id} locale={locale} />
+                    {failure?.walletId === wallet.id ? (
+                      <p className="text-12 text-negative">
+                        {failure.code === "WALLET_HAS_TRANSACTIONS"
+                          ? t("errors.WALLET_HAS_TRANSACTIONS", {
+                              count: failure.count,
+                            })
+                          : t(`errors.${failure.code}`)}
+                      </p>
+                    ) : null}
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

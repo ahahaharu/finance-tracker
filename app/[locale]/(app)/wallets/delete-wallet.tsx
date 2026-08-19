@@ -1,74 +1,38 @@
-"use client";
-
-import { useState, useTransition } from "react";
 import type { Locale } from "next-intl";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
-import { deleteWalletAction, type WalletFormState } from "./actions";
+import { deleteWalletAction } from "./actions";
 
-function DeleteWallet({
+async function DeleteWallet({
   walletId,
   locale,
 }: {
   walletId: string;
   locale: Locale;
 }) {
-  const t = useTranslations("wallets");
-  const [confirming, setConfirming] = useState(false);
-  const [state, setState] = useState<WalletFormState>({});
-  const [pending, startTransition] = useTransition();
-
-  function confirmDelete() {
-    startTransition(async () => {
-      const result = await deleteWalletAction(locale, walletId);
-
-      setState(result);
-      setConfirming(false);
-    });
-  }
+  const t = await getTranslations("wallets");
 
   return (
-    <div className="flex flex-col items-end gap-1">
-      {confirming ? (
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            onClick={() => setConfirming(false)}
-            disabled={pending}
-          >
-            {t("actions.cancel")}
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={confirmDelete}
-            disabled={pending}
-          >
-            {t("actions.confirmDelete")}
-          </Button>
-        </div>
-      ) : (
-        <Button
-          variant="ghost"
-          onClick={() => {
-            setState({});
-            setConfirming(true);
-          }}
-        >
-          {t("actions.delete")}
+    <details className="group flex items-center justify-end gap-1">
+      <summary
+        className={cn(
+          buttonVariants({ variant: "ghost" }),
+          "cursor-default list-none [&::-webkit-details-marker]:hidden",
+        )}
+      >
+        <span className="group-open:hidden">{t("actions.delete")}</span>
+        <span className="hidden group-open:inline">{t("actions.cancel")}</span>
+      </summary>
+      <form action={deleteWalletAction.bind(null, locale)}>
+        <input type="hidden" name="walletId" value={walletId} />
+        <Button type="submit" variant="destructive">
+          {t("actions.confirmDelete")}
         </Button>
-      )}
-      {state.code ? (
-        <p className="text-12 text-negative">
-          {state.code === "WALLET_HAS_TRANSACTIONS"
-            ? t("errors.WALLET_HAS_TRANSACTIONS", {
-                count: state.transactionCount ?? 0,
-              })
-            : t(`errors.${state.code}`)}
-        </p>
-      ) : null}
-    </div>
+      </form>
+    </details>
   );
 }
 

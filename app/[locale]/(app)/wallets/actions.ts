@@ -135,17 +135,36 @@ export async function updateWalletAction(
 
 export async function deleteWalletAction(
   locale: Locale,
-  walletId: string,
-): Promise<WalletFormState> {
+  formData: FormData,
+): Promise<never> {
   const user = await requireUser();
+  const walletId = String(formData.get("walletId") ?? "");
+
+  let failure: WalletFormState | null = null;
 
   try {
     await deleteWallet(user.id, walletId);
   } catch (error) {
-    return toFormState(error);
+    failure = toFormState(error);
   }
 
   revalidatePath(`/${locale}/wallets`);
 
-  return {};
+  if (!failure) {
+    return redirect({ href: "/wallets", locale });
+  }
+
+  return redirect({
+    href: {
+      pathname: "/wallets",
+      query: {
+        error: failure.code as string,
+        walletId,
+        ...(failure.transactionCount === undefined
+          ? {}
+          : { count: String(failure.transactionCount) }),
+      },
+    },
+    locale,
+  });
 }
