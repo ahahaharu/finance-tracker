@@ -183,6 +183,37 @@
       "INCOME": "Income",
       "EXPENSE": "Expense"
     },
+    "filters": {
+      "from": "From",
+      "to": "To",
+      "wallet": "Wallet",
+      "category": "Category",
+      "type": "Type",
+      "any": "Any",
+      "query": "Search in notes",
+      "queryPlaceholder": "groceries",
+      "sort": "Order",
+      "newestFirst": "Newest first",
+      "oldestFirst": "Oldest first",
+      "apply": "Apply",
+      "reset": "Reset",
+      "export": "Export CSV"
+    },
+    "filterTypes": {
+      "INCOME": "Income",
+      "EXPENSE": "Expense",
+      "TRANSFER": "Transfers"
+    },
+    "totals": {
+      "label": "{count} records",
+      "income": "Income",
+      "expense": "Expense"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "position": "Page {page} of {totalPages}"
+    },
     "columns": {
       "time": "Time",
       "description": "Description",

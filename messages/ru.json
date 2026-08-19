@@ -183,6 +183,37 @@
       "INCOME": "Доход",
       "EXPENSE": "Расход"
     },
+    "filters": {
+      "from": "С даты",
+      "to": "По дату",
+      "wallet": "Счёт",
+      "category": "Категория",
+      "type": "Тип",
+      "any": "Любой",
+      "query": "Поиск по комментарию",
+      "queryPlaceholder": "продукты",
+      "sort": "Порядок",
+      "newestFirst": "Сначала новые",
+      "oldestFirst": "Сначала старые",
+      "apply": "Применить",
+      "reset": "Сбросить",
+      "export": "Выгрузить CSV"
+    },
+    "filterTypes": {
+      "INCOME": "Доходы",
+      "EXPENSE": "Расходы",
+      "TRANSFER": "Переводы"
+    },
+    "totals": {
+      "label": "Итого записей: {count}",
+      "income": "Доход",
+      "expense": "Расход"
+    },
+    "pagination": {
+      "previous": "Назад",
+      "next": "Вперёд",
+      "position": "Страница {page} из {totalPages}"
+    },
     "columns": {
       "time": "Время",
       "description": "Описание",

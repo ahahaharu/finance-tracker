@@ -42,31 +42,84 @@ export type TransactionPage = {
   take: number;
 };
 
+export type TransactionFilter = {
+  from?: Date;
+  to?: Date;
+  walletIds?: readonly string[];
+  categoryIds?: readonly string[];
+  types?: readonly TransactionType[];
+  query?: string;
+  ascending?: boolean;
+};
+
+export type TypeTotal = {
+  type: TransactionType;
+  total: number;
+};
+
 export type TransactionRepository = {
   listByUser(
     userId: string,
+    filter: TransactionFilter,
     page?: TransactionPage,
   ): Promise<TransactionRecord[]>;
-  countByUser(userId: string): Promise<number>;
+  countByUser(userId: string, filter: TransactionFilter): Promise<number>;
+  sumBaseAmountsByType(
+    userId: string,
+    filter: TransactionFilter,
+  ): Promise<TypeTotal[]>;
   findById(id: string): Promise<TransactionRecord | null>;
   create(data: NewTransaction): Promise<TransactionRecord>;
   update(id: string, changes: TransactionChanges): Promise<TransactionRecord>;
   remove(id: string): Promise<void>;
 };
 
+function whereClause(userId: string, filter: TransactionFilter) {
+  return {
+    userId,
+    walletId: filter.walletIds ? { in: [...filter.walletIds] } : undefined,
+    categoryId: filter.categoryIds
+      ? { in: [...filter.categoryIds] }
+      : undefined,
+    type: filter.types ? { in: [...filter.types] } : undefined,
+    note: filter.query
+      ? { contains: filter.query, mode: "insensitive" as const }
+      : undefined,
+    occurredAt:
+      filter.from || filter.to
+        ? { gte: filter.from, lte: filter.to }
+        : undefined,
+  };
+}
+
 export const transactionRepository: TransactionRepository = {
-  listByUser(userId, page) {
+  listByUser(userId, filter, page) {
+    const direction = filter.ascending ? "asc" : "desc";
+
     return prisma.transaction.findMany({
-      where: { userId },
+      where: whereClause(userId, filter),
       include: withReferences,
-      orderBy: [{ occurredAt: "desc" }, { createdAt: "desc" }],
+      orderBy: [{ occurredAt: direction }, { createdAt: direction }],
       skip: page?.skip,
       take: page?.take,
     });
   },
 
-  countByUser(userId) {
-    return prisma.transaction.count({ where: { userId } });
+  countByUser(userId, filter) {
+    return prisma.transaction.count({ where: whereClause(userId, filter) });
+  },
+
+  async sumBaseAmountsByType(userId, filter) {
+    const groups = await prisma.transaction.groupBy({
+      by: ["type"],
+      where: whereClause(userId, filter),
+      _sum: { baseAmount: true },
+    });
+
+    return groups.map((group) => ({
+      type: group.type,
+      total: group._sum.baseAmount ?? 0,
+    }));
   },
 
   findById(id) {

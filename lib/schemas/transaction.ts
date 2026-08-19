@@ -35,5 +35,27 @@ export const updateTransactionSchema = z
   })
   .partial();
 
+export const filterTypes = ["INCOME", "EXPENSE", "TRANSFER"] as const;
+
+export type FilterType = (typeof filterTypes)[number];
+
+export const sortOrders = ["occurredAt:desc", "occurredAt:asc"] as const;
+
+const identifiers = z
+  .union([z.string().min(1), z.array(z.string().min(1))])
+  .transform((value) => (Array.isArray(value) ? value : [value]))
+  .optional();
+
+export const transactionFilterSchema = z.object({
+  from: z.iso.date().optional(),
+  to: z.iso.date().optional(),
+  walletId: identifiers,
+  categoryId: identifiers,
+  type: z.enum(filterTypes).optional(),
+  q: z.string().trim().min(1).max(200).optional(),
+  sort: z.enum(sortOrders).default("occurredAt:desc"),
+});
+
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
 export type UpdateTransactionInput = z.infer<typeof updateTransactionSchema>;
+export type TransactionFilterInput = z.infer<typeof transactionFilterSchema>;

@@ -37,7 +37,10 @@ export function created<T>(data: T, location: string): NextResponse {
   });
 }
 
-export function collection<T>(data: T[], meta: CollectionMeta): NextResponse {
+export function collection<T>(
+  data: T[],
+  meta: CollectionMeta & Record<string, unknown>,
+): NextResponse {
   return NextResponse.json({ data, meta });
 }
 
@@ -89,8 +92,8 @@ export function toErrorResponse(error: unknown): NextResponse {
 }
 
 export async function handle(
-  run: () => Promise<NextResponse>,
-): Promise<NextResponse> {
+  run: () => Promise<Response>,
+): Promise<Response> {
   try {
     return await run();
   } catch (error) {
