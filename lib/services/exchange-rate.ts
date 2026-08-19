@@ -185,11 +185,22 @@ function endpoint(date: Date): string {
   return `${base}/rates?ondate=${isoDate(date)}&periodicity=0`;
 }
 
+async function requestRates(date: Date): Promise<Response> {
+  try {
+    return await fetch(endpoint(date), {
+      headers: { accept: "application/json" },
+      cache: "no-store",
+    });
+  } catch (error) {
+    throw new Error(
+      `National Bank at ${endpoint(date)} is unreachable: check the network or NBRB_API_URL`,
+      { cause: error },
+    );
+  }
+}
+
 async function fetchRatesForDate(date: Date): Promise<NewExchangeRate[]> {
-  const response = await fetch(endpoint(date), {
-    headers: { accept: "application/json" },
-    cache: "no-store",
-  });
+  const response = await requestRates(date);
 
   if (!response.ok) {
     throw new Error(

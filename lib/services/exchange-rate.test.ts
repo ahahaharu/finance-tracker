@@ -343,6 +343,18 @@ describe("refreshRates", () => {
     expect(repository.saveMany).not.toHaveBeenCalled();
   });
 
+  it("explains an unreachable National Bank instead of leaking the network error", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockRejectedValue(new TypeError("fetch failed")),
+    );
+
+    await expect(refreshRates({ from: TODAY, to: TODAY })).rejects.toThrow(
+      /unreachable/,
+    );
+    expect(repository.saveMany).not.toHaveBeenCalled();
+  });
+
   it("rejects a response that does not match the published format", async () => {
     respondWith([{ Cur_Abbreviation: "USD" }]);
 
