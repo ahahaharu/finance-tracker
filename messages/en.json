@@ -64,6 +64,70 @@
     "transactions": "Transactions",
     "budgets": "Budgets"
   },
+  "dashboard": {
+    "title": "Overview",
+    "period": {
+      "label": "Period",
+      "from": "From",
+      "to": "End date",
+      "apply": "Show",
+      "jump": "Jump to date",
+      "current": {
+        "day": "Today",
+        "month": "This month",
+        "year": "This year"
+      },
+      "previous": "Previous",
+      "next": "Next",
+      "custom": "{from} — {to}"
+    },
+    "ranges": {
+      "day": "Day",
+      "month": "Month",
+      "year": "Year",
+      "custom": "Range"
+    },
+    "balance": "Total balance",
+    "balanceIncomplete": "Some wallets have no rate loaded and are left out of the total",
+    "delta": "This period",
+    "figures": {
+      "income": "Income",
+      "expense": "Expense",
+      "net": "Net"
+    },
+    "sections": {
+      "wallets": "Wallets",
+      "budgets": "Budgets",
+      "categories": "Expenses by category",
+      "monthly": "Expense trend, 6 months",
+      "recent": "Latest transactions"
+    },
+    "columns": {
+      "time": "Time",
+      "description": "Description",
+      "category": "Category",
+      "wallet": "Wallet",
+      "amount": "Amount"
+    },
+    "noNote": "No note",
+    "empty": {
+      "wallets": "No wallets yet — the total balance appears after the first one.",
+      "budgets": "No budgets for this month.",
+      "categories": "No expenses in the selected period.",
+      "transactions": "No transactions yet."
+    },
+    "actions": {
+      "addWallet": "Add wallet",
+      "addBudget": "Add budget",
+      "addTransaction": "Add transaction",
+      "allTransactions": "All transactions",
+      "retry": "Retry"
+    },
+    "percent": "{percent}%",
+    "errors": {
+      "unexpected": "Could not load the overview"
+    }
+  },
   "wallets": {
     "title": "Wallets",
     "add": "Add wallet",
