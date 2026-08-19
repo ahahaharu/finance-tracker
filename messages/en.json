@@ -59,7 +59,8 @@
   },
   "navigation": {
     "overview": "Overview",
-    "wallets": "Wallets"
+    "wallets": "Wallets",
+    "categories": "Categories"
   },
   "wallets": {
     "title": "Wallets",
@@ -114,6 +115,60 @@
       "WALLET_HAS_TRANSACTIONS": "The wallet has {count} transactions. Delete them first",
       "NOT_FOUND": "Wallet not found",
       "unexpected": "Wallets could not be loaded"
+    }
+  },
+  "categories": {
+    "title": "Categories",
+    "add": "Add category",
+    "empty": "No categories. Add the first one or change the filter.",
+    "filters": {
+      "all": "All"
+    },
+    "kinds": {
+      "INCOME": "Income",
+      "EXPENSE": "Expense"
+    },
+    "columns": {
+      "name": "Name",
+      "kind": "Kind",
+      "actions": "Actions"
+    },
+    "fields": {
+      "name": "Name",
+      "kind": "Kind",
+      "color": "Colour"
+    },
+    "placeholders": {
+      "name": "Groceries"
+    },
+    "colorOption": "Colour {number}",
+    "hints": {
+      "kindFixed": "The kind is set at creation and never changes afterwards"
+    },
+    "fieldErrors": {
+      "name": "Enter a name no longer than 40 characters",
+      "kind": "Choose a category kind",
+      "color": "Choose a colour from the set"
+    },
+    "form": {
+      "createTitle": "New category",
+      "editTitle": "Category",
+      "create": "Create category",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "actions": {
+      "delete": "Delete",
+      "confirmDelete": "Confirm",
+      "cancel": "Cancel",
+      "retry": "Retry"
+    },
+    "errors": {
+      "VALIDATION_FAILED": "Check the fields above",
+      "CATEGORY_NAME_TAKEN": "A category with this name and kind already exists",
+      "CATEGORY_HAS_TRANSACTIONS": "The category has {count} transactions. Delete them first",
+      "NOT_FOUND": "Category not found",
+      "unexpected": "Categories could not be loaded"
     }
   },
   "budget": {

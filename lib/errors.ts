@@ -82,6 +82,20 @@ export class WalletHasTransactionsError extends DomainError {
   }
 }
 
+export class CategoryNameTakenError extends DomainError {
+  constructor() {
+    super("CATEGORY_NAME_TAKEN", "Category name is already used for this kind");
+  }
+}
+
+export class CategoryHasTransactionsError extends DomainError {
+  constructor(transactionCount: number) {
+    super("CATEGORY_HAS_TRANSACTIONS", "Category has related transactions", {
+      transactionCount,
+    });
+  }
+}
+
 export class NotFoundError extends DomainError {
   constructor() {
     super("NOT_FOUND", "Resource does not exist or belongs to another user");

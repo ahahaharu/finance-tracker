@@ -229,8 +229,16 @@ FR-7.6: мартовский расход остаётся мартовским,
 |---|---|---|
 | `GET` | `/api/v1/categories` | список; фильтр `kind=INCOME\|EXPENSE` |
 | `POST` | `/api/v1/categories` | создание |
+| `GET` | `/api/v1/categories/{id}` | одна категория |
 | `PATCH` | `/api/v1/categories/{id}` | изменение наименования и цвета |
 | `DELETE` | `/api/v1/categories/{id}` | удаление |
+
+Список упорядочен по виду, затем по наименованию; параметр `sort` к этому
+ресурсу не применяется. `PATCH` принимает любое подмножество полей `name`
+и `color`; `kind` в теле запроса отбрасывается (FR-3.3). Цвет принимается
+только из фиксированного набора двенадцати оттенков `--cat-1..12`
+(`docs/design-system.md`, раздел 2); произвольное значение отклоняется
+кодом `VALIDATION_FAILED`.
 
 Ошибки: `CATEGORY_NAME_TAKEN`, `CATEGORY_HAS_TRANSACTIONS`, `NOT_FOUND`.
 
