@@ -68,6 +68,20 @@ export class ForbiddenError extends DomainError {
   }
 }
 
+export class WalletNameTakenError extends DomainError {
+  constructor() {
+    super("WALLET_NAME_TAKEN", "Wallet name is already used");
+  }
+}
+
+export class WalletHasTransactionsError extends DomainError {
+  constructor(transactionCount: number) {
+    super("WALLET_HAS_TRANSACTIONS", "Wallet has related transactions", {
+      transactionCount,
+    });
+  }
+}
+
 export class NotFoundError extends DomainError {
   constructor() {
     super("NOT_FOUND", "Resource does not exist or belongs to another user");

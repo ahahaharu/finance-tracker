@@ -47,6 +47,7 @@ app/[locale]/(app)/**   UI. Server components read via services.
                         Mutations go through server actions.
 app/[locale]/(auth)/**  Sign-in and registration screens.
 app/api/v1/**           REST route handlers (FR-11.1).
+lib/api/**              REST response and error mapping shared by handlers.
 lib/services/**         ALL business logic. Unit tests live next to it.
 lib/repositories/**     The only place allowed to call prisma.*
 lib/schemas/**          Zod schemas — shared by API, actions and forms.

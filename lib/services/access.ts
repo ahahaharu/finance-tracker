@@ -24,10 +24,10 @@ export async function getActiveUser(
   return toAuthenticatedUser(user);
 }
 
-export function assertOwnership(
-  resource: { userId: string } | null,
+export function assertOwnership<T extends { userId: string }>(
+  resource: T | null | undefined,
   userId: string,
-): void {
+): asserts resource is T {
   if (!resource || resource.userId !== userId) {
     throw new NotFoundError();
   }
