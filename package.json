@@ -13,6 +13,7 @@
     "db:down": "docker compose down",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
+    "rates:refresh": "tsx scripts/refresh-rates.ts",
     "db:studio": "prisma studio"
   },
   "dependencies": {

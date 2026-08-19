@@ -9,7 +9,12 @@ import {
 } from "@/lib/api/response";
 import { requireUser } from "@/lib/auth/guards";
 import { updateWalletSchema } from "@/lib/schemas/wallet";
-import { deleteWallet, getWallet, updateWallet } from "@/lib/services/wallet";
+import {
+  balanceOptions,
+  deleteWallet,
+  getWallet,
+  updateWallet,
+} from "@/lib/services/wallet";
 
 export function GET(
   _request: NextRequest,
@@ -19,7 +24,7 @@ export function GET(
     const user = await requireUser();
     const { id } = await context.params;
 
-    return resource(await getWallet(user.id, id));
+    return resource(await getWallet(user.id, id, balanceOptions(user)));
   });
 }
 
@@ -42,7 +47,9 @@ export function PATCH(
       return validationFailure(input.error);
     }
 
-    return resource(await updateWallet(user.id, id, input.data));
+    return resource(
+      await updateWallet(user.id, id, input.data, balanceOptions(user)),
+    );
   });
 }
 

@@ -28,10 +28,33 @@ const repository = vi.hoisted(() => ({
   remove: vi.fn(),
 }));
 
+const rateRepository = vi.hoisted(() => ({
+  findLatestOnOrBefore: vi.fn(),
+  listLatestOnOrBefore: vi.fn(),
+  saveMany: vi.fn(),
+}));
+
 vi.mock("@/lib/repositories/wallet", () => ({ walletRepository: repository }));
+vi.mock("@/lib/repositories/exchange-rate", () => ({
+  exchangeRateRepository: rateRepository,
+}));
 
 const OWNER = "usr_1";
 const STRANGER = "usr_2";
+const TODAY = new Date("2026-08-19T10:00:00.000Z");
+const IN_BYN = { baseCurrency: "BYN", on: TODAY } as const;
+const IN_USD = { baseCurrency: "USD", on: TODAY } as const;
+
+function rateFixture(rate: string, date = "2026-08-19") {
+  return {
+    id: `rate_${date}`,
+    date: new Date(`${date}T00:00:00.000Z`),
+    fromCurrency: "USD",
+    toCurrency: "BYN",
+    rate: { toFixed: () => rate },
+    fetchedAt: new Date(`${date}T00:00:00.000Z`),
+  };
+}
 
 function walletFixture(overrides: Partial<Wallet> = {}): Wallet {
   return {
@@ -63,6 +86,7 @@ beforeEach(() => {
   repository.findByName.mockResolvedValue(null);
   repository.sumAmountsByType.mockResolvedValue([]);
   repository.countTransactions.mockResolvedValue(0);
+  rateRepository.findLatestOnOrBefore.mockResolvedValue(null);
   repository.create.mockImplementation((data: Wallet) =>
     Promise.resolve(walletFixture(data)),
   );
@@ -100,7 +124,7 @@ describe("listWallets", () => {
       movement("EXPENSE", 15_000, "wal_2"),
     ]);
 
-    const { items, total } = await listWallets(OWNER);
+    const { items, total } = await listWallets(OWNER, IN_BYN);
 
     expect(total).toBe(2);
     expect(items.map((wallet) => wallet.currentBalance)).toEqual([
@@ -110,13 +134,13 @@ describe("listWallets", () => {
   });
 
   it("asks the repository only for the wallets of the given user", async () => {
-    await listWallets(OWNER);
+    await listWallets(OWNER, IN_BYN);
 
     expect(repository.listByUser).toHaveBeenCalledWith(OWNER, undefined);
   });
 
   it("translates a page into skip and take", async () => {
-    await listWallets(OWNER, { page: 3, pageSize: 20 });
+    await listWallets(OWNER, IN_BYN, { page: 3, pageSize: 20 });
 
     expect(repository.listByUser).toHaveBeenCalledWith(OWNER, {
       skip: 40,
@@ -125,23 +149,116 @@ describe("listWallets", () => {
   });
 });
 
+describe("listWallets in the reporting currency", () => {
+  it("repeats the balance of a wallet already in the reporting currency", async () => {
+    repository.sumAmountsByType.mockResolvedValue([movement("INCOME", 5_000)]);
+
+    const { items, totalBalance } = await listWallets(OWNER, IN_BYN);
+
+    expect(items[0].baseBalance).toBe(15_000);
+    expect(items[0].baseCurrency).toBe("BYN");
+    expect(rateRepository.findLatestOnOrBefore).not.toHaveBeenCalled();
+    expect(totalBalance).toEqual({
+      amount: 15_000,
+      currency: "BYN",
+      complete: true,
+    });
+  });
+
+  it("converts a foreign wallet by the rate of the requested day", async () => {
+    repository.listByUser.mockResolvedValue([
+      walletFixture({ id: "wal_2", currency: "USD", initialBalance: 10_000 }),
+    ]);
+    rateRepository.findLatestOnOrBefore.mockResolvedValue(
+      rateFixture("3.24560000"),
+    );
+
+    const { items } = await listWallets(OWNER, IN_BYN);
+
+    expect(items[0].baseBalance).toBe(32_456);
+    expect(rateRepository.findLatestOnOrBefore).toHaveBeenCalledWith(
+      "USD",
+      new Date("2026-08-19T00:00:00.000Z"),
+    );
+  });
+
+  it("leaves the reporting balance empty when no rate exists at all", async () => {
+    repository.listByUser.mockResolvedValue([
+      walletFixture({ currency: "USD", initialBalance: 10_000 }),
+    ]);
+
+    const { items, totalBalance } = await listWallets(OWNER, IN_BYN);
+
+    expect(items[0].baseBalance).toBeNull();
+    expect(totalBalance).toEqual({
+      amount: 0,
+      currency: "BYN",
+      complete: false,
+    });
+  });
+
+  it("sums only the wallets it could convert and says the total is partial", async () => {
+    repository.listByUser.mockResolvedValue([
+      walletFixture({ id: "wal_1", currency: "BYN", initialBalance: 20_000 }),
+      walletFixture({ id: "wal_2", currency: "EUR", initialBalance: 10_000 }),
+    ]);
+
+    const { totalBalance } = await listWallets(OWNER, IN_BYN);
+
+    expect(totalBalance).toEqual({
+      amount: 20_000,
+      currency: "BYN",
+      complete: false,
+    });
+  });
+
+  it("asks for one rate per currency, not per wallet", async () => {
+    repository.listByUser.mockResolvedValue([
+      walletFixture({ id: "wal_1", currency: "USD" }),
+      walletFixture({ id: "wal_2", currency: "USD" }),
+      walletFixture({ id: "wal_3", currency: "BYN" }),
+    ]);
+    rateRepository.findLatestOnOrBefore.mockResolvedValue(
+      rateFixture("3.24560000"),
+    );
+
+    await listWallets(OWNER, IN_BYN);
+
+    expect(rateRepository.findLatestOnOrBefore).toHaveBeenCalledTimes(1);
+  });
+
+  it("converts through the base currency when reporting in a foreign one", async () => {
+    repository.listByUser.mockResolvedValue([
+      walletFixture({ currency: "BYN", initialBalance: 32_456 }),
+    ]);
+    rateRepository.findLatestOnOrBefore.mockResolvedValue(
+      rateFixture("3.24560000"),
+    );
+
+    const { items } = await listWallets(OWNER, IN_USD);
+
+    expect(items[0].baseBalance).toBe(10_000);
+    expect(items[0].baseCurrency).toBe("USD");
+  });
+});
+
 describe("getWallet", () => {
   it("returns the wallet with its current balance", async () => {
     repository.sumAmountsByType.mockResolvedValue([movement("INCOME", 1_000)]);
 
-    const wallet = await getWallet(OWNER, "wal_1");
+    const wallet = await getWallet(OWNER, "wal_1", IN_BYN);
 
     expect(wallet.currentBalance).toBe(11_000);
   });
 
   it("rejects a wallet owned by another user", async () => {
-    await expect(getWallet(STRANGER, "wal_1")).rejects.toThrow(NotFoundError);
+    await expect(getWallet(STRANGER, "wal_1", IN_BYN)).rejects.toThrow(NotFoundError);
   });
 
   it("rejects a wallet that does not exist", async () => {
     repository.findById.mockResolvedValue(null);
 
-    await expect(getWallet(OWNER, "wal_1")).rejects.toThrow(NotFoundError);
+    await expect(getWallet(OWNER, "wal_1", IN_BYN)).rejects.toThrow(NotFoundError);
   });
 });
 
@@ -154,7 +271,7 @@ describe("createWallet", () => {
   } as const;
 
   it("stores the wallet for the given user", async () => {
-    await createWallet(OWNER, input);
+    await createWallet(OWNER, input, IN_BYN);
 
     expect(repository.create).toHaveBeenCalledWith({ userId: OWNER, ...input });
   });
@@ -162,14 +279,14 @@ describe("createWallet", () => {
   it("rejects a name already used by the same user", async () => {
     repository.findByName.mockResolvedValue(walletFixture({ id: "wal_9" }));
 
-    await expect(createWallet(OWNER, input)).rejects.toThrow(
+    await expect(createWallet(OWNER, input, IN_BYN)).rejects.toThrow(
       WalletNameTakenError,
     );
     expect(repository.create).not.toHaveBeenCalled();
   });
 
   it("reports the initial balance as the current one", async () => {
-    const wallet = await createWallet(OWNER, input);
+    const wallet = await createWallet(OWNER, input, IN_BYN);
 
     expect(wallet.currentBalance).toBe(100_000);
   });
@@ -183,7 +300,7 @@ describe("updateWallet", () => {
   } as const;
 
   it("rejects a wallet owned by another user", async () => {
-    await expect(updateWallet(STRANGER, "wal_1", changes)).rejects.toThrow(
+    await expect(updateWallet(STRANGER, "wal_1", changes, IN_BYN)).rejects.toThrow(
       NotFoundError,
     );
     expect(repository.update).not.toHaveBeenCalled();
@@ -192,7 +309,7 @@ describe("updateWallet", () => {
   it("keeps the name when it belongs to the wallet being updated", async () => {
     repository.findByName.mockResolvedValue(walletFixture({ name: "Карта" }));
 
-    await expect(updateWallet(OWNER, "wal_1", changes)).resolves.toMatchObject({
+    await expect(updateWallet(OWNER, "wal_1", changes, IN_BYN)).resolves.toMatchObject({
       name: "Карта",
     });
   });
@@ -202,14 +319,14 @@ describe("updateWallet", () => {
       walletFixture({ id: "wal_2", name: "Карта" }),
     );
 
-    await expect(updateWallet(OWNER, "wal_1", changes)).rejects.toThrow(
+    await expect(updateWallet(OWNER, "wal_1", changes, IN_BYN)).rejects.toThrow(
       WalletNameTakenError,
     );
     expect(repository.update).not.toHaveBeenCalled();
   });
 
   it("keeps the fields left out of a partial change", async () => {
-    await updateWallet(OWNER, "wal_1", { initialBalance: 500 });
+    await updateWallet(OWNER, "wal_1", { initialBalance: 500 }, IN_BYN);
 
     expect(repository.update).toHaveBeenCalledWith("wal_1", {
       name: "Наличные",
@@ -222,7 +339,7 @@ describe("updateWallet", () => {
   it("recomputes the balance from the new initial balance", async () => {
     repository.sumAmountsByType.mockResolvedValue([movement("EXPENSE", 5_000)]);
 
-    const wallet = await updateWallet(OWNER, "wal_1", changes);
+    const wallet = await updateWallet(OWNER, "wal_1", changes, IN_BYN);
 
     expect(wallet.currentBalance).toBe(15_000);
   });

@@ -7,6 +7,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -14,7 +15,7 @@ import {
 import { Link } from "@/i18n/navigation";
 import { toLocale } from "@/i18n/routing";
 import { requireUser } from "@/lib/auth/guards";
-import { listWallets } from "@/lib/services/wallet";
+import { balanceOptions, listWallets } from "@/lib/services/wallet";
 
 import { type WalletFormErrorCode } from "./actions";
 import { DeleteWallet } from "./delete-wallet";
@@ -56,8 +57,8 @@ export default async function WalletsPage({
   setRequestLocale(locale);
 
   const user = await requireUser();
-  const [{ items }, query, t] = await Promise.all([
-    listWallets(user.id),
+  const [{ items, totalBalance }, query, t] = await Promise.all([
+    listWallets(user.id, balanceOptions(user)),
     searchParams,
     getTranslations("wallets"),
   ]);
@@ -111,6 +112,13 @@ export default async function WalletsPage({
                   <Amount
                     minor={wallet.currentBalance}
                     currency={wallet.currency}
+                    baseMinor={
+                      wallet.currency === wallet.baseCurrency ||
+                      wallet.baseBalance === null
+                        ? undefined
+                        : wallet.baseBalance
+                    }
+                    baseCurrency={wallet.baseCurrency}
                   />
                 </TableCell>
                 <TableCell>
@@ -130,8 +138,26 @@ export default async function WalletsPage({
               </TableRow>
             ))}
           </TableBody>
+          <TableFooter>
+            <TableRow className="hover:bg-sunken">
+              <TableCell colSpan={3} className="text-12 text-ink-muted">
+                {t("total")}
+              </TableCell>
+              <TableCell className="text-right">
+                <Amount
+                  minor={totalBalance.amount}
+                  currency={totalBalance.currency}
+                />
+              </TableCell>
+              <TableCell />
+            </TableRow>
+          </TableFooter>
         </Table>
       )}
+
+      {items.length > 0 && !totalBalance.complete ? (
+        <p className="text-12 text-ink-muted">{t("totalIncomplete")}</p>
+      ) : null}
     </div>
   );
 }
