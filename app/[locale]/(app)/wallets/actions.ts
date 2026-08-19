@@ -10,6 +10,7 @@ import { type ErrorCode, isDomainError } from "@/lib/errors";
 import { parseMoney } from "@/lib/format/money";
 import { createWalletSchema, updateWalletSchema } from "@/lib/schemas/wallet";
 import {
+  balanceOptions,
   createWallet,
   deleteWallet,
   updateWallet,
@@ -86,7 +87,7 @@ export async function createWalletAction(
   }
 
   try {
-    await createWallet(user.id, input.data);
+    await createWallet(user.id, input.data, balanceOptions(user));
   } catch (error) {
     return toFormState(error);
   }
@@ -123,7 +124,7 @@ export async function updateWalletAction(
   }
 
   try {
-    await updateWallet(user.id, walletId, input.data);
+    await updateWallet(user.id, walletId, input.data, balanceOptions(user));
   } catch (error) {
     return toFormState(error);
   }

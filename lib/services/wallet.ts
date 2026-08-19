@@ -14,6 +14,11 @@ import type {
   UpdateWalletInput,
 } from "@/lib/schemas/wallet";
 import { assertOwnership } from "@/lib/services/access";
+import {
+  applyRate,
+  findConversion,
+  parseRate,
+} from "@/lib/services/exchange-rate";
 
 export type WalletView = {
   id: string;
@@ -22,13 +27,33 @@ export type WalletView = {
   currency: Currency;
   initialBalance: number;
   currentBalance: number;
+  baseBalance: number | null;
+  baseCurrency: Currency;
   createdAt: Date;
+};
+
+export type TotalBalance = {
+  amount: number;
+  currency: Currency;
+  complete: boolean;
 };
 
 export type WalletList = {
   items: WalletView[];
   total: number;
+  totalBalance: TotalBalance;
 };
+
+export type BalanceOptions = {
+  baseCurrency: Currency;
+  on: Date;
+};
+
+export function balanceOptions(user: {
+  baseCurrency: Currency;
+}): BalanceOptions {
+  return { baseCurrency: user.baseCurrency, on: new Date() };
+}
 
 const incoming: readonly TransactionType[] = ["INCOME", "TRANSFER_IN"];
 
@@ -45,15 +70,58 @@ export function computeBalance(
   );
 }
 
-function toView(wallet: Wallet, movements: readonly WalletMovement[]): WalletView {
+function toView(
+  wallet: Wallet,
+  movements: readonly WalletMovement[],
+  options: BalanceOptions,
+  rate: string | null,
+): WalletView {
+  const currentBalance = computeBalance(wallet.initialBalance, movements);
+
   return {
     id: wallet.id,
     name: wallet.name,
     type: wallet.type,
     currency: wallet.currency,
     initialBalance: wallet.initialBalance,
-    currentBalance: computeBalance(wallet.initialBalance, movements),
+    currentBalance,
+    baseBalance: rate === null ? null : applyRate(currentBalance, parseRate(rate)),
+    baseCurrency: options.baseCurrency,
     createdAt: wallet.createdAt,
+  };
+}
+
+async function ratesFor(
+  currencies: readonly Currency[],
+  options: BalanceOptions,
+): Promise<Map<Currency, string | null>> {
+  const distinct = [...new Set(currencies)];
+  const conversions = await Promise.all(
+    distinct.map((currency) =>
+      findConversion({
+        from: currency,
+        to: options.baseCurrency,
+        on: options.on,
+      }),
+    ),
+  );
+
+  return new Map(
+    distinct.map((currency, index) => [
+      currency,
+      conversions[index]?.rate ?? null,
+    ]),
+  );
+}
+
+function sumBaseBalances(
+  items: readonly WalletView[],
+  baseCurrency: Currency,
+): TotalBalance {
+  return {
+    amount: items.reduce((total, wallet) => total + (wallet.baseBalance ?? 0), 0),
+    currency: baseCurrency,
+    complete: items.every((wallet) => wallet.baseBalance !== null),
   };
 }
 
@@ -79,6 +147,7 @@ async function ownedWallet(userId: string, walletId: string): Promise<Wallet> {
 
 export async function listWallets(
   userId: string,
+  options: BalanceOptions,
   page?: CollectionQuery,
 ): Promise<WalletList> {
   const [wallets, total] = await Promise.all([
@@ -91,46 +160,67 @@ export async function listWallets(
     walletRepository.countByUser(userId),
   ]);
 
-  const movements = await walletRepository.sumAmountsByType(
-    wallets.map((wallet) => wallet.id),
+  const [movements, rates] = await Promise.all([
+    walletRepository.sumAmountsByType(wallets.map((wallet) => wallet.id)),
+    ratesFor(
+      wallets.map((wallet) => wallet.currency),
+      options,
+    ),
+  ]);
+
+  const items = wallets.map((wallet) =>
+    toView(
+      wallet,
+      movements.filter((movement) => movement.walletId === wallet.id),
+      options,
+      rates.get(wallet.currency) ?? null,
+    ),
   );
 
   return {
-    items: wallets.map((wallet) =>
-      toView(
-        wallet,
-        movements.filter((movement) => movement.walletId === wallet.id),
-      ),
-    ),
+    items,
     total,
+    totalBalance: sumBaseBalances(items, options.baseCurrency),
   };
 }
 
 export async function getWallet(
   userId: string,
   walletId: string,
+  options: BalanceOptions,
 ): Promise<WalletView> {
   const wallet = await ownedWallet(userId, walletId);
-  const movements = await walletRepository.sumAmountsByType([wallet.id]);
+  const [movements, rates] = await Promise.all([
+    walletRepository.sumAmountsByType([wallet.id]),
+    ratesFor([wallet.currency], options),
+  ]);
 
-  return toView(wallet, movements);
+  return toView(
+    wallet,
+    movements,
+    options,
+    rates.get(wallet.currency) ?? null,
+  );
 }
 
 export async function createWallet(
   userId: string,
   input: CreateWalletInput,
+  options: BalanceOptions,
 ): Promise<WalletView> {
   await assertNameIsFree(userId, input.name);
 
   const created = await walletRepository.create({ userId, ...input });
+  const rates = await ratesFor([created.currency], options);
 
-  return toView(created, []);
+  return toView(created, [], options, rates.get(created.currency) ?? null);
 }
 
 export async function updateWallet(
   userId: string,
   walletId: string,
   input: UpdateWalletInput,
+  options: BalanceOptions,
 ): Promise<WalletView> {
   const wallet = await ownedWallet(userId, walletId);
 
@@ -145,9 +235,17 @@ export async function updateWallet(
   }
 
   const updated = await walletRepository.update(wallet.id, changes);
-  const movements = await walletRepository.sumAmountsByType([wallet.id]);
+  const [movements, rates] = await Promise.all([
+    walletRepository.sumAmountsByType([wallet.id]),
+    ratesFor([updated.currency], options),
+  ]);
 
-  return toView(updated, movements);
+  return toView(
+    updated,
+    movements,
+    options,
+    rates.get(updated.currency) ?? null,
+  );
 }
 
 export async function deleteWallet(

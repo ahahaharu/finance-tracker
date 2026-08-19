@@ -96,6 +96,12 @@ export class CategoryHasTransactionsError extends DomainError {
   }
 }
 
+export class RateNotAvailableError extends DomainError {
+  constructor() {
+    super("RATE_NOT_AVAILABLE", "No exchange rate for this date or earlier");
+  }
+}
+
 export class NotFoundError extends DomainError {
   constructor() {
     super("NOT_FOUND", "Resource does not exist or belongs to another user");

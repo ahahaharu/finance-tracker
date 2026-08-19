@@ -66,6 +66,8 @@
     "title": "Wallets",
     "add": "Add wallet",
     "empty": "No wallets yet. Add the first one to start tracking.",
+    "total": "Total balance",
+    "totalIncomplete": "Some wallets have no rate yet and are left out of the total",
     "columns": {
       "name": "Name",
       "type": "Type",

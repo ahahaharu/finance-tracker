@@ -53,6 +53,7 @@ lib/repositories/**     The only place allowed to call prisma.*
 lib/schemas/**          Zod schemas — shared by API, actions and forms.
 lib/auth/**             Auth.js config, session helpers, guards.
 prisma/                 schema.prisma, migrations, seed.ts
+scripts/                one-off maintenance scripts run through pnpm
 i18n/                   next-intl routing, request config, navigation helpers
 messages/               ru.json, en.json
 proxy.ts                locale routing and unauthenticated redirects

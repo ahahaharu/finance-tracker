@@ -5,7 +5,11 @@ import { Amount } from "@/components/ui/amount";
 import { toLocale } from "@/i18n/routing";
 import { requireUser } from "@/lib/auth/guards";
 import { NotFoundError } from "@/lib/errors";
-import { getWallet, type WalletView } from "@/lib/services/wallet";
+import {
+  balanceOptions,
+  getWallet,
+  type WalletView,
+} from "@/lib/services/wallet";
 
 import { updateWalletAction } from "../actions";
 import { WalletForm } from "../wallet-form";
@@ -23,7 +27,7 @@ export default async function WalletPage({
   let wallet: WalletView;
 
   try {
-    wallet = await getWallet(user.id, id);
+    wallet = await getWallet(user.id, id, balanceOptions(user));
   } catch (error) {
     if (error instanceof NotFoundError) {
       notFound();
