@@ -61,7 +61,8 @@
     "overview": "Overview",
     "wallets": "Wallets",
     "categories": "Categories",
-    "transactions": "Transactions"
+    "transactions": "Transactions",
+    "budgets": "Budgets"
   },
   "wallets": {
     "title": "Wallets",
@@ -310,6 +311,51 @@
       "FUTURE_DATE": "A transfer cannot be dated in the future",
       "RATE_NOT_AVAILABLE": "No rate for this date or earlier — load the rates first",
       "NOT_FOUND": "Transfer not found"
+    }
+  },
+  "budgets": {
+    "title": "Budgets",
+    "add": "Add budget",
+    "empty": "No budgets for this month.",
+    "needsCategory": "Create at least one expense category first.",
+    "months": {
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "fields": {
+      "category": "Category",
+      "limit": "Limit"
+    },
+    "placeholders": {
+      "category": "Select a category",
+      "limit": "0.00"
+    },
+    "hints": {
+      "categoryFixed": "The category of a budget never changes after creation"
+    },
+    "fieldErrors": {
+      "category": "Select an expense category",
+      "limit": "Enter a limit greater than zero, for example 400.00"
+    },
+    "form": {
+      "createTitle": "New budget",
+      "editTitle": "Budget",
+      "create": "Create budget",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "actions": {
+      "delete": "Delete",
+      "confirmDelete": "Confirm",
+      "cancel": "Cancel",
+      "retry": "Retry"
+    },
+    "errors": {
+      "VALIDATION_FAILED": "Check the fields above",
+      "BUDGET_EXISTS": "A budget for this category and month already exists",
+      "CATEGORY_KIND_MISMATCH": "A budget applies to an expense category only",
+      "NOT_FOUND": "Budget not found",
+      "unexpected": "Budgets could not be loaded"
     }
   },
   "budget": {

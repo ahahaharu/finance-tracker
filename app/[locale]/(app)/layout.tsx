@@ -13,6 +13,7 @@ const navigation = [
   { href: "/wallets", key: "wallets" },
   { href: "/transactions", key: "transactions" },
   { href: "/categories", key: "categories" },
+  { href: "/budgets", key: "budgets" },
 ] as const;
 
 export default async function AppLayout({
