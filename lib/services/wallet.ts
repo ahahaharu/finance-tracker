@@ -161,7 +161,10 @@ export async function listWallets(
   ]);
 
   const [movements, rates] = await Promise.all([
-    walletRepository.sumAmountsByType(wallets.map((wallet) => wallet.id)),
+    walletRepository.sumAmountsByType(
+      userId,
+      wallets.map((wallet) => wallet.id),
+    ),
     ratesFor(
       wallets.map((wallet) => wallet.currency),
       options,
@@ -191,7 +194,7 @@ export async function getWallet(
 ): Promise<WalletView> {
   const wallet = await ownedWallet(userId, walletId);
   const [movements, rates] = await Promise.all([
-    walletRepository.sumAmountsByType([wallet.id]),
+    walletRepository.sumAmountsByType(userId, [wallet.id]),
     ratesFor([wallet.currency], options),
   ]);
 
@@ -236,7 +239,7 @@ export async function updateWallet(
 
   const updated = await walletRepository.update(wallet.id, changes);
   const [movements, rates] = await Promise.all([
-    walletRepository.sumAmountsByType([wallet.id]),
+    walletRepository.sumAmountsByType(userId, [wallet.id]),
     ratesFor([updated.currency], options),
   ]);
 

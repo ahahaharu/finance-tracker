@@ -47,12 +47,10 @@ const IN_USD = { baseCurrency: "USD", on: TODAY } as const;
 
 function rateFixture(rate: string, date = "2026-08-19") {
   return {
-    id: `rate_${date}`,
-    date: new Date(`${date}T00:00:00.000Z`),
+    date: new Date(`${date}T00:00:00.000Z`).toISOString(),
     fromCurrency: "USD",
     toCurrency: "BYN",
-    rate: { toFixed: () => rate },
-    fetchedAt: new Date(`${date}T00:00:00.000Z`),
+    rate,
   };
 }
 

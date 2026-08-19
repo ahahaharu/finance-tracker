@@ -202,10 +202,9 @@ export async function createTransfer(
     },
   ];
 
-  return toTransferView(
-    await transferRepository.createPair(legs),
-    context.baseCurrency,
-  );
+  const created = await transferRepository.createPair(legs);
+
+  return toTransferView(created, context.baseCurrency);
 }
 
 export async function deleteTransfer(

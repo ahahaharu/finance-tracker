@@ -265,7 +265,8 @@
       "RATE_NOT_AVAILABLE": "No rate for this date or earlier — load the rates first",
       "NOT_FOUND": "Transaction not found",
       "unexpected": "Transactions could not be loaded"
-    }
+    },
+    "emptyFiltered": "No transactions match these filters."
   },
   "transfers": {
     "title": "New transfer",
@@ -356,7 +357,10 @@
       "CATEGORY_KIND_MISMATCH": "A budget applies to an expense category only",
       "NOT_FOUND": "Budget not found",
       "unexpected": "Budgets could not be loaded"
-    }
+    },
+    "remaining": "Remaining",
+    "over": "Over by",
+    "percent": "{percent}%"
   },
   "budget": {
     "withinLimit": "on track",

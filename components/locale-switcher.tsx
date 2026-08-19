@@ -33,7 +33,12 @@ function LocaleSwitcher() {
 
   return (
     <Tooltip content={description}>
-      <Button variant="ghost" onClick={switchLocale} aria-label={description}>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={switchLocale}
+        aria-label={description}
+      >
         {t(locale)}
       </Button>
     </Tooltip>

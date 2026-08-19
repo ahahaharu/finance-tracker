@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 
 import { failure, handle, resource } from "@/lib/api/response";
+import { invalidate, RATES_TAG } from "@/lib/cache/tags";
 import { refreshRates } from "@/lib/services/exchange-rate";
 
 export function GET(request: NextRequest) {
@@ -12,7 +13,10 @@ export function GET(request: NextRequest) {
     }
 
     const today = new Date();
+    const result = await refreshRates({ from: today, to: today });
 
-    return resource(await refreshRates({ from: today, to: today }));
+    invalidate([RATES_TAG]);
+
+    return resource(result);
   });
 }
