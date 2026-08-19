@@ -54,7 +54,66 @@
     "signOut": "Sign out",
     "session": {
       "title": "You are signed in",
-      "hint": "Wallets, transactions and analytics arrive in later tasks."
+      "hint": "Transactions and analytics arrive in later tasks."
+    }
+  },
+  "navigation": {
+    "overview": "Overview",
+    "wallets": "Wallets"
+  },
+  "wallets": {
+    "title": "Wallets",
+    "add": "Add wallet",
+    "empty": "No wallets yet. Add the first one to start tracking.",
+    "columns": {
+      "name": "Name",
+      "type": "Type",
+      "currency": "Currency",
+      "balance": "Balance",
+      "actions": "Actions"
+    },
+    "types": {
+      "CASH": "Cash",
+      "CARD": "Card",
+      "SAVINGS": "Savings"
+    },
+    "fields": {
+      "name": "Name",
+      "type": "Type",
+      "currency": "Currency",
+      "initialBalance": "Opening balance"
+    },
+    "placeholders": {
+      "name": "Cash"
+    },
+    "hints": {
+      "currencyFixed": "The currency is set at creation and never changes afterwards"
+    },
+    "fieldErrors": {
+      "name": "Enter a name no longer than 60 characters",
+      "type": "Choose a wallet type",
+      "currency": "Choose a currency",
+      "initialBalance": "Enter an amount, for example 1250.00"
+    },
+    "form": {
+      "createTitle": "New wallet",
+      "editTitle": "Wallet",
+      "create": "Create wallet",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "actions": {
+      "delete": "Delete",
+      "confirmDelete": "Confirm",
+      "cancel": "Cancel",
+      "retry": "Retry"
+    },
+    "errors": {
+      "VALIDATION_FAILED": "Check the fields above",
+      "WALLET_NAME_TAKEN": "A wallet with this name already exists",
+      "WALLET_HAS_TRANSACTIONS": "The wallet has {count} transactions. Delete them first",
+      "NOT_FOUND": "Wallet not found",
+      "unexpected": "Wallets could not be loaded"
     }
   },
   "budget": {
