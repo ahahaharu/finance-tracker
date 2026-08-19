@@ -57,6 +57,11 @@ export type TypeTotal = {
   total: number;
 };
 
+export type CategoryTotal = {
+  categoryId: string;
+  total: number;
+};
+
 export type TransactionRepository = {
   listByUser(
     userId: string,
@@ -68,6 +73,10 @@ export type TransactionRepository = {
     userId: string,
     filter: TransactionFilter,
   ): Promise<TypeTotal[]>;
+  sumBaseAmountsByCategory(
+    userId: string,
+    filter: TransactionFilter,
+  ): Promise<CategoryTotal[]>;
   findById(id: string): Promise<TransactionRecord | null>;
   create(data: NewTransaction): Promise<TransactionRecord>;
   update(id: string, changes: TransactionChanges): Promise<TransactionRecord>;
@@ -107,6 +116,21 @@ export const transactionRepository: TransactionRepository = {
 
   countByUser(userId, filter) {
     return prisma.transaction.count({ where: whereClause(userId, filter) });
+  },
+
+  async sumBaseAmountsByCategory(userId, filter) {
+    const groups = await prisma.transaction.groupBy({
+      by: ["categoryId"],
+      where: whereClause(userId, filter),
+      _sum: { baseAmount: true },
+    });
+
+    return groups
+      .filter((group) => group.categoryId !== null)
+      .map((group) => ({
+        categoryId: group.categoryId as string,
+        total: group._sum.baseAmount ?? 0,
+      }));
   },
 
   async sumBaseAmountsByType(userId, filter) {

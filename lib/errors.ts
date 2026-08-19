@@ -96,6 +96,12 @@ export class CategoryHasTransactionsError extends DomainError {
   }
 }
 
+export class BudgetExistsError extends DomainError {
+  constructor() {
+    super("BUDGET_EXISTS", "Budget for this category and month already exists");
+  }
+}
+
 export class CategoryKindMismatchError extends DomainError {
   constructor() {
     super("CATEGORY_KIND_MISMATCH", "Category kind does not match the type");
