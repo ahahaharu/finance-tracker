@@ -207,8 +207,10 @@ describe("createTransfer", () => {
       walletFixture({ id: "wal_2", currency: "USD" }),
     );
     rates.findLatestOnOrBefore.mockResolvedValue({
-      date: new Date("2026-08-18T00:00:00.000Z"),
-      rate: { toFixed: () => "3.24560000" },
+      date: "2026-08-18T00:00:00.000Z",
+      fromCurrency: "USD",
+      toCurrency: "BYN",
+      rate: "3.24560000",
     });
 
     await expect(createTransfer(OWNER, input, IN_BYN)).rejects.toThrow(
@@ -223,8 +225,10 @@ describe("createTransfer", () => {
       walletFixture({ id: "wal_2", currency: "USD" }),
     );
     rates.findLatestOnOrBefore.mockResolvedValue({
-      date: new Date("2026-08-18T00:00:00.000Z"),
-      rate: { toFixed: () => "3.00000000" },
+      date: "2026-08-18T00:00:00.000Z",
+      fromCurrency: "USD",
+      toCurrency: "BYN",
+      rate: "3.00000000",
     });
 
     const transfer = await createTransfer(

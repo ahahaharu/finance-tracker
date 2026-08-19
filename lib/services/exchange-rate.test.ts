@@ -1,9 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { RateNotAvailableError } from "@/lib/errors";
-import type { ExchangeRate } from "@/lib/generated/prisma/client";
 import type { Currency } from "@/lib/generated/prisma/enums";
-import type { NewExchangeRate } from "@/lib/repositories/exchange-rate";
+import type {
+  NewExchangeRate,
+  StoredRate,
+} from "@/lib/repositories/exchange-rate";
 import {
   applyRate,
   convertAmount,
@@ -36,18 +38,16 @@ function rateFixture(
   fromCurrency: Currency,
   rate: string,
   date: string,
-): ExchangeRate {
+): StoredRate {
   return {
-    id: `rate_${fromCurrency}_${date}`,
-    date: utc(date),
+    date: utc(date).toISOString(),
     fromCurrency,
     toCurrency: "BYN",
-    rate: { toFixed: () => rate } as unknown as ExchangeRate["rate"],
-    fetchedAt: utc(date),
+    rate,
   };
 }
 
-function storedRates(rates: Record<string, ExchangeRate | null>) {
+function storedRates(rates: Record<string, StoredRate | null>) {
   repository.findLatestOnOrBefore.mockImplementation((currency: Currency) =>
     Promise.resolve(rates[currency] ?? null),
   );

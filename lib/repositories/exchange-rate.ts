@@ -1,8 +1,12 @@
 import { unstable_cache } from "next/cache";
 
+import { RATES_TAG } from "@/lib/cache/tags";
 import { prisma } from "@/lib/db";
-import type { ExchangeRate } from "@/lib/generated/prisma/client";
 import type { Currency } from "@/lib/generated/prisma/enums";
+
+export const RATE_SCALE = 8;
+
+const CACHE_SECONDS = 60 * 60;
 
 export type NewExchangeRate = {
   date: Date;
@@ -10,42 +14,65 @@ export type NewExchangeRate = {
   rate: string;
 };
 
+export type StoredRate = {
+  date: string;
+  fromCurrency: Currency;
+  toCurrency: Currency;
+  rate: string;
+};
+
 export type ExchangeRateRepository = {
   findLatestOnOrBefore(
     fromCurrency: Currency,
     date: Date,
-  ): Promise<ExchangeRate | null>;
-  listLatestOnOrBefore(date: Date): Promise<ExchangeRate[]>;
+  ): Promise<StoredRate | null>;
+  listLatestOnOrBefore(date: Date): Promise<StoredRate[]>;
   saveMany(rates: readonly NewExchangeRate[]): Promise<number>;
 };
 
-export const RATES_CACHE_TAG = "exchange-rates";
-
-const CACHE_SECONDS = 60 * 60;
+function toStored(row: {
+  date: Date;
+  fromCurrency: Currency;
+  toCurrency: Currency;
+  rate: { toFixed(digits: number): string };
+}): StoredRate {
+  return {
+    date: row.date.toISOString(),
+    fromCurrency: row.fromCurrency,
+    toCurrency: row.toCurrency,
+    rate: row.rate.toFixed(RATE_SCALE),
+  };
+}
 
 const cachedLatestOnOrBefore = unstable_cache(
-  (fromCurrency: Currency, date: string) =>
-    prisma.exchangeRate.findFirst({
+  async (fromCurrency: Currency, date: string) => {
+    const row = await prisma.exchangeRate.findFirst({
       where: {
         fromCurrency,
         toCurrency: "BYN",
         date: { lte: new Date(date) },
       },
       orderBy: { date: "desc" },
-    }),
+    });
+
+    return row ? toStored(row) : null;
+  },
   ["exchange-rate-latest"],
-  { tags: [RATES_CACHE_TAG], revalidate: CACHE_SECONDS },
+  { tags: [RATES_TAG], revalidate: CACHE_SECONDS },
 );
 
 const cachedListLatestOnOrBefore = unstable_cache(
-  (date: string) =>
-    prisma.exchangeRate.findMany({
+  async (date: string) => {
+    const rows = await prisma.exchangeRate.findMany({
       where: { toCurrency: "BYN", date: { lte: new Date(date) } },
       orderBy: { date: "desc" },
       distinct: ["fromCurrency"],
-    }),
+    });
+
+    return rows.map(toStored);
+  },
   ["exchange-rate-list"],
-  { tags: [RATES_CACHE_TAG], revalidate: CACHE_SECONDS },
+  { tags: [RATES_TAG], revalidate: CACHE_SECONDS },
 );
 
 export const exchangeRateRepository: ExchangeRateRepository = {

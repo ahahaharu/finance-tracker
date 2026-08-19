@@ -33,7 +33,10 @@ export type WalletRepository = {
   countByUser(userId: string): Promise<number>;
   findById(id: string): Promise<Wallet | null>;
   findByName(userId: string, name: string): Promise<Wallet | null>;
-  sumAmountsByType(walletIds: readonly string[]): Promise<WalletMovement[]>;
+  sumAmountsByType(
+    userId: string,
+    walletIds: readonly string[],
+  ): Promise<WalletMovement[]>;
   countTransactions(walletId: string): Promise<number>;
   create(data: NewWallet): Promise<Wallet>;
   update(id: string, changes: WalletChanges): Promise<Wallet>;
@@ -79,14 +82,14 @@ export const walletRepository: WalletRepository = {
     return prisma.wallet.findUnique({ where: { userId_name: { userId, name } } });
   },
 
-  async sumAmountsByType(walletIds) {
+  async sumAmountsByType(userId, walletIds) {
     if (walletIds.length === 0) {
       return [];
     }
 
     const groups = await prisma.transaction.groupBy({
       by: ["walletId", "type"],
-      where: { walletId: { in: [...walletIds] } },
+      where: { userId, walletId: { in: [...walletIds] } },
       _sum: { amount: true },
     });
 

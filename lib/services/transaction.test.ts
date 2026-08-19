@@ -118,12 +118,10 @@ function recordFixture(
 
 function rateFixture(rate: string, date: string) {
   return {
-    id: `rate_${date}`,
-    date: utc(date),
+    date: utc(date).toISOString(),
     fromCurrency: "USD",
     toCurrency: "BYN",
-    rate: { toFixed: () => rate },
-    fetchedAt: utc(date),
+    rate,
   };
 }
 

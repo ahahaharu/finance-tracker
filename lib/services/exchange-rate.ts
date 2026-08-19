@@ -101,7 +101,7 @@ async function rateToBase(
   );
 
   return stored
-    ? { scaled: parseRate(stored.rate.toFixed(RATE_PRECISION)), date: stored.date }
+    ? { scaled: parseRate(stored.rate), date: new Date(stored.date) }
     : null;
 }
 
@@ -166,8 +166,8 @@ export async function listRates(on: Date): Promise<RateView[]> {
   return stored.map((rate) => ({
     fromCurrency: rate.fromCurrency,
     toCurrency: rate.toCurrency,
-    rate: rate.rate.toFixed(RATE_PRECISION),
-    date: rate.date,
+    rate: rate.rate,
+    date: new Date(rate.date),
   }));
 }
 
