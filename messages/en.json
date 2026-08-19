@@ -60,7 +60,8 @@
   "navigation": {
     "overview": "Overview",
     "wallets": "Wallets",
-    "categories": "Categories"
+    "categories": "Categories",
+    "transactions": "Transactions"
   },
   "wallets": {
     "title": "Wallets",
@@ -171,6 +172,66 @@
       "CATEGORY_HAS_TRANSACTIONS": "The category has {count} transactions. Delete them first",
       "NOT_FOUND": "Category not found",
       "unexpected": "Categories could not be loaded"
+    }
+  },
+  "transactions": {
+    "title": "Transactions",
+    "empty": "No transactions yet. The first one shows up here right after you add it.",
+    "needsWalletAndCategory": "Adding a transaction needs at least one wallet and one category.",
+    "noNote": "No note",
+    "types": {
+      "INCOME": "Income",
+      "EXPENSE": "Expense"
+    },
+    "columns": {
+      "time": "Time",
+      "description": "Description",
+      "category": "Category",
+      "wallet": "Wallet",
+      "amount": "Amount"
+    },
+    "fields": {
+      "type": "Type",
+      "amount": "Amount",
+      "wallet": "Wallet",
+      "category": "Category",
+      "occurredAt": "Date and time",
+      "note": "Note",
+      "rate": "Rate",
+      "rateDate": "Rate date"
+    },
+    "placeholders": {
+      "amount": "0.00",
+      "wallet": "Select a wallet",
+      "category": "Select a category",
+      "note": "Weekly groceries"
+    },
+    "fieldErrors": {
+      "amount": "Enter an amount greater than zero, for example 24.50",
+      "wallet": "Select a wallet",
+      "category": "Select a category",
+      "occurredAt": "Enter a date and time",
+      "note": "No longer than 500 characters"
+    },
+    "form": {
+      "editTitle": "Transaction",
+      "create": "Add",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "actions": {
+      "delete": "Delete",
+      "confirmDelete": "Confirm",
+      "cancel": "Cancel",
+      "retry": "Retry"
+    },
+    "errors": {
+      "VALIDATION_FAILED": "Check the fields above",
+      "CATEGORY_KIND_MISMATCH": "The category does not match the transaction type",
+      "FUTURE_DATE": "A transaction cannot be dated in the future",
+      "RATE_NOT_AVAILABLE": "No rate for this date or earlier — load the rates first",
+      "NOT_FOUND": "Transaction not found",
+      "unexpected": "Transactions could not be loaded"
     }
   },
   "budget": {

@@ -96,6 +96,18 @@ export class CategoryHasTransactionsError extends DomainError {
   }
 }
 
+export class CategoryKindMismatchError extends DomainError {
+  constructor() {
+    super("CATEGORY_KIND_MISMATCH", "Category kind does not match the type");
+  }
+}
+
+export class FutureDateError extends DomainError {
+  constructor() {
+    super("FUTURE_DATE", "Transaction date is in the future");
+  }
+}
+
 export class RateNotAvailableError extends DomainError {
   constructor() {
     super("RATE_NOT_AVAILABLE", "No exchange rate for this date or earlier");
