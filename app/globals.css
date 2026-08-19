@@ -130,8 +130,9 @@
   --spacing-row: 44px;
   --spacing-page: 24px;
   --spacing-section: 32px;
-  --spacing-sidebar: 232px;
+  --spacing-sidebar: 264px;
   --container-content: 1180px;
+  --spacing-form: 320px;
 
   --radius-xs: var(--radius);
   --radius-sm: var(--radius);

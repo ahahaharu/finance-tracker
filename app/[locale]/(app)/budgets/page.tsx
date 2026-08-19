@@ -1,18 +1,14 @@
+import { Suspense } from "react";
 import { addMonths, format } from "date-fns";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 
-import { Amount } from "@/components/ui/amount";
-import { BudgetStatus } from "@/components/ui/budget-status";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { CategoryDot } from "@/components/ui/category-dot";
-import { EmptyState } from "@/components/ui/empty-state";
+import { buttonVariants } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@/i18n/navigation";
 import { toLocale } from "@/i18n/routing";
-import { requireUser } from "@/lib/auth/guards";
-import { listBudgets, monthRange } from "@/lib/services/budget";
-import { cn } from "@/lib/utils";
+import { monthRange } from "@/lib/services/budget";
 
-import { deleteBudgetAction } from "./actions";
+import { BudgetsList } from "./budgets-list";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -43,16 +39,13 @@ export default async function BudgetsPage({
 
   setRequestLocale(locale);
 
-  const user = await requireUser();
   const query = await searchParams;
   const month = readMonth(query);
-  const [budgets, t, formatter] = await Promise.all([
-    listBudgets(user.id, month),
+  const failed = single(query.error) !== undefined;
+  const [t, formatter] = await Promise.all([
     getTranslations("budgets"),
     getFormatter(),
   ]);
-
-  const failed = single(query.error) !== undefined;
 
   return (
     <div className="flex flex-col gap-section">
@@ -88,78 +81,12 @@ export default async function BudgetsPage({
         <p className="text-12 text-negative">{t("errors.NOT_FOUND")}</p>
       ) : null}
 
-      {budgets.length === 0 ? (
-        <EmptyState message={t("empty")} />
-      ) : (
-        <ul className="flex flex-col">
-          {budgets.map((budget) => (
-            <li
-              key={budget.id}
-              className="flex flex-col gap-2 border-b border-line py-3"
-            >
-              <div className="flex items-center justify-between gap-4">
-                <Link
-                  href={{
-                    pathname: `/budgets/${budget.id}`,
-                    query: { month },
-                  }}
-                  className="flex items-center gap-2 text-13 text-ink"
-                >
-                  <CategoryDot color={budget.categoryColor} />
-                  {budget.categoryName}
-                </Link>
-
-                <div className="flex items-center gap-3">
-                  <span className="flex items-baseline gap-1">
-                    <Amount
-                      minor={budget.spentAmount}
-                      currency={budget.currency}
-                    />
-                    <span className="text-12 text-ink-faint">/</span>
-                    <Amount
-                      minor={budget.limitAmount}
-                      currency={budget.currency}
-                    />
-                  </span>
-                  <BudgetStatus ratio={budget.usedPercent / 100} />
-                  <details className="group flex items-center gap-1">
-                    <summary
-                      className={cn(
-                        buttonVariants({ variant: "ghost" }),
-                        "cursor-default list-none [&::-webkit-details-marker]:hidden",
-                      )}
-                    >
-                      <span className="group-open:hidden">
-                        {t("actions.delete")}
-                      </span>
-                      <span className="hidden group-open:inline">
-                        {t("actions.cancel")}
-                      </span>
-                    </summary>
-                    <form action={deleteBudgetAction.bind(null, locale)}>
-                      <input type="hidden" name="budgetId" value={budget.id} />
-                      <input type="hidden" name="month" value={month} />
-                      <Button type="submit" variant="destructive">
-                        {t("actions.confirmDelete")}
-                      </Button>
-                    </form>
-                  </details>
-                </div>
-              </div>
-
-              <div className="h-[3px] w-full bg-sunken">
-                <div
-                  className={cn(
-                    "h-full",
-                    budget.isExceeded ? "bg-negative" : "bg-ink",
-                  )}
-                  style={{ width: `${Math.min(budget.usedPercent, 100)}%` }}
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+      <Suspense
+        key={month}
+        fallback={<Skeleton rows={4} columns={3} header={false} />}
+      >
+        <BudgetsList locale={locale} month={month} />
+      </Suspense>
     </div>
   );
 }

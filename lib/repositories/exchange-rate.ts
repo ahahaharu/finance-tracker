@@ -1,3 +1,5 @@
+import { unstable_cache } from "next/cache";
+
 import { prisma } from "@/lib/db";
 import type { ExchangeRate } from "@/lib/generated/prisma/client";
 import type { Currency } from "@/lib/generated/prisma/enums";
@@ -17,20 +19,42 @@ export type ExchangeRateRepository = {
   saveMany(rates: readonly NewExchangeRate[]): Promise<number>;
 };
 
+export const RATES_CACHE_TAG = "exchange-rates";
+
+const CACHE_SECONDS = 60 * 60;
+
+const cachedLatestOnOrBefore = unstable_cache(
+  (fromCurrency: Currency, date: string) =>
+    prisma.exchangeRate.findFirst({
+      where: {
+        fromCurrency,
+        toCurrency: "BYN",
+        date: { lte: new Date(date) },
+      },
+      orderBy: { date: "desc" },
+    }),
+  ["exchange-rate-latest"],
+  { tags: [RATES_CACHE_TAG], revalidate: CACHE_SECONDS },
+);
+
+const cachedListLatestOnOrBefore = unstable_cache(
+  (date: string) =>
+    prisma.exchangeRate.findMany({
+      where: { toCurrency: "BYN", date: { lte: new Date(date) } },
+      orderBy: { date: "desc" },
+      distinct: ["fromCurrency"],
+    }),
+  ["exchange-rate-list"],
+  { tags: [RATES_CACHE_TAG], revalidate: CACHE_SECONDS },
+);
+
 export const exchangeRateRepository: ExchangeRateRepository = {
   findLatestOnOrBefore(fromCurrency, date) {
-    return prisma.exchangeRate.findFirst({
-      where: { fromCurrency, toCurrency: "BYN", date: { lte: date } },
-      orderBy: { date: "desc" },
-    });
+    return cachedLatestOnOrBefore(fromCurrency, date.toISOString());
   },
 
   listLatestOnOrBefore(date) {
-    return prisma.exchangeRate.findMany({
-      where: { toCurrency: "BYN", date: { lte: date } },
-      orderBy: { date: "desc" },
-      distinct: ["fromCurrency"],
-    });
+    return cachedListLatestOnOrBefore(date.toISOString());
   },
 
   async saveMany(rates) {

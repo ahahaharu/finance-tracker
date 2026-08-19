@@ -1,8 +1,10 @@
 "use client";
 
+import { LogOut } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
+import { Tooltip } from "@/components/ui/tooltip";
 
 import { signOutAction } from "./actions";
 
@@ -12,9 +14,16 @@ function SignOutButton() {
 
   return (
     <form action={signOutAction.bind(null, locale)}>
-      <Button type="submit" variant="secondary">
-        {t("signOut")}
-      </Button>
+      <Tooltip content={t("signOut")}>
+        <Button
+          type="submit"
+          variant="ghost"
+          size="icon"
+          aria-label={t("signOut")}
+        >
+          <LogOut aria-hidden />
+        </Button>
+      </Tooltip>
     </form>
   );
 }

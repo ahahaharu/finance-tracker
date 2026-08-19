@@ -338,7 +338,9 @@ export default function ShowcasePage({ params }: PageProps<"/[locale]">) {
           <SectionTitle>{t("sections.empty")}</SectionTitle>
           <EmptyState
             message={t("emptyMessage")}
-            actionLabel={t("emptyAction")}
+            action={
+              <Button variant="secondary">{t("emptyAction")}</Button>
+            }
           />
         </section>
 
