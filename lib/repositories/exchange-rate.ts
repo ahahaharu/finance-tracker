@@ -75,13 +75,41 @@ const cachedListLatestOnOrBefore = unstable_cache(
   { tags: [RATES_TAG], revalidate: CACHE_SECONDS },
 );
 
+async function latestOnOrBefore(fromCurrency: Currency, date: string) {
+  const row = await prisma.exchangeRate.findFirst({
+    where: { fromCurrency, toCurrency: "BYN", date: { lte: new Date(date) } },
+    orderBy: { date: "desc" },
+  });
+
+  return row ? toStored(row) : null;
+}
+
 export const exchangeRateRepository: ExchangeRateRepository = {
-  findLatestOnOrBefore(fromCurrency, date) {
-    return cachedLatestOnOrBefore(fromCurrency, date.toISOString());
+  async findLatestOnOrBefore(fromCurrency, date) {
+    const key = date.toISOString();
+    const cached = await cachedLatestOnOrBefore(fromCurrency, key);
+
+    if (cached) {
+      return cached;
+    }
+
+    return latestOnOrBefore(fromCurrency, key);
   },
 
-  listLatestOnOrBefore(date) {
-    return cachedListLatestOnOrBefore(date.toISOString());
+  async listLatestOnOrBefore(date) {
+    const cached = await cachedListLatestOnOrBefore(date.toISOString());
+
+    if (cached.length > 0) {
+      return cached;
+    }
+
+    const rows = await prisma.exchangeRate.findMany({
+      where: { toCurrency: "BYN", date: { lte: date } },
+      orderBy: { date: "desc" },
+      distinct: ["fromCurrency"],
+    });
+
+    return rows.map(toStored);
   },
 
   async saveMany(rates) {

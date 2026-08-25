@@ -4,7 +4,7 @@ import { Currency } from "@/lib/generated/prisma/enums";
 
 const emailSchema = z.string().trim().toLowerCase().pipe(z.email());
 
-const passwordSchema = z
+export const passwordSchema = z
   .string()
   .min(8)
   .max(72)
