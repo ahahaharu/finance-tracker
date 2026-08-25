@@ -12,7 +12,7 @@ import { userRepository } from "@/lib/repositories/user";
 import type { CredentialsInput, RegisterInput } from "@/lib/schemas/auth";
 import { buildDefaultCategories } from "@/lib/services/default-categories";
 
-const BCRYPT_COST = 10;
+export const BCRYPT_COST = 10;
 
 export type AuthenticatedUser = {
   id: string;

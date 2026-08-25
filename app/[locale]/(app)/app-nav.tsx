@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   type LucideIcon,
   Receipt,
+  Settings,
   Shield,
   Tags,
   Target,
@@ -20,6 +21,7 @@ type NavigationKey =
   | "transactions"
   | "categories"
   | "budgets"
+  | "settings"
   | "admin";
 
 type NavigationItem = {
@@ -34,6 +36,7 @@ const navigation: readonly NavigationItem[] = [
   { href: "/transactions", key: "transactions", icon: Receipt },
   { href: "/categories", key: "categories", icon: Tags },
   { href: "/budgets", key: "budgets", icon: Target },
+  { href: "/settings", key: "settings", icon: Settings },
 ];
 
 const administration: NavigationItem = {

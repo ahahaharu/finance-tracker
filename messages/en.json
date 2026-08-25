@@ -63,7 +63,8 @@
     "categories": "Categories",
     "transactions": "Transactions",
     "budgets": "Budgets",
-    "admin": "Administration"
+    "admin": "Administration",
+    "settings": "Settings"
   },
   "dashboard": {
     "title": "Overview",
@@ -568,6 +569,53 @@
       "NOT_FOUND": "Account not found",
       "VALIDATION_FAILED": "Check the submitted fields",
       "unexpected": "Could not load the administration section"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "saved": "Saved",
+    "passwordChanged": "Password changed",
+    "currencyChanged": "Base currency changed, amounts recalculated",
+    "sections": {
+      "profile": "Profile",
+      "baseCurrency": "Base currency",
+      "password": "Password"
+    },
+    "fields": {
+      "name": "Name",
+      "language": "Interface language",
+      "baseCurrency": "Base currency",
+      "currentPassword": "Current password",
+      "newPassword": "New password"
+    },
+    "languages": {
+      "ru": "Russian",
+      "en": "English"
+    },
+    "hints": {
+      "rebase": "Amounts in the base currency are recalculated at the rates of their own dates, not at today's rate",
+      "sameCurrency": "This is the current base currency",
+      "confirmRebase": "Every transaction and budget will be recalculated into {currency}. The recalculation cannot be undone — switching back recalculates the amounts again"
+    },
+    "fieldErrors": {
+      "name": "Enter a name of up to 80 characters",
+      "currentPassword": "Enter your current password",
+      "newPassword": "At least 8 characters with one letter and one digit"
+    },
+    "actions": {
+      "save": "Save",
+      "change": "Change currency",
+      "confirmChange": "Recalculate",
+      "cancel": "Cancel",
+      "changePassword": "Change password",
+      "retry": "Retry"
+    },
+    "errors": {
+      "VALIDATION_FAILED": "Check the submitted fields",
+      "INVALID_CREDENTIALS": "The current password does not match",
+      "RATE_NOT_AVAILABLE": "No rate for one of the required dates — the currency is unchanged",
+      "NOT_FOUND": "Account not found",
+      "unexpected": "Could not load the settings"
     }
   }
 }

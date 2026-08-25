@@ -26,6 +26,11 @@ export type UserChanges = {
   isBlocked?: boolean;
 };
 
+export type ProfileChanges = {
+  name?: string;
+  locale?: string;
+};
+
 export type UserWithActivity = User & {
   _count: { transactions: number };
 };
@@ -37,6 +42,8 @@ export type UserRepository = {
   listAll(filter: UserFilter, page?: UserPage): Promise<UserWithActivity[]>;
   countAll(filter: UserFilter): Promise<number>;
   update(id: string, changes: UserChanges): Promise<User>;
+  updateProfile(id: string, changes: ProfileChanges): Promise<User>;
+  updatePassword(id: string, passwordHash: string): Promise<User>;
   countTransactions(): Promise<number>;
   listRegistrations(from: Date, to: Date): Promise<Date[]>;
 };
@@ -97,6 +104,14 @@ export const userRepository: UserRepository = {
 
   update(id, changes) {
     return prisma.user.update({ where: { id }, data: changes });
+  },
+
+  updateProfile(id, changes) {
+    return prisma.user.update({ where: { id }, data: changes });
+  },
+
+  updatePassword(id, passwordHash) {
+    return prisma.user.update({ where: { id }, data: { passwordHash } });
   },
 
   countTransactions() {
