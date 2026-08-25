@@ -132,6 +132,15 @@ export class RateNotAvailableError extends DomainError {
   }
 }
 
+export class SelfModificationForbiddenError extends DomainError {
+  constructor() {
+    super(
+      "SELF_MODIFICATION_FORBIDDEN",
+      "Administrator cannot modify their own account",
+    );
+  }
+}
+
 export class NotFoundError extends DomainError {
   constructor() {
     super("NOT_FOUND", "Resource does not exist or belongs to another user");

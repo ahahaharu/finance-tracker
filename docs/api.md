@@ -487,7 +487,47 @@ FR-7.6: мартовский расход остаётся мартовским,
 и количество операций. **Суммы, счета, категории и бюджеты пользователей
 не возвращаются** (FR-10.7).
 
-Ошибки: `FORBIDDEN`, `SELF_MODIFICATION_FORBIDDEN`, `NOT_FOUND`.
+`GET /api/v1/admin/users` принимает `page`, `pageSize` и поиск `q` —
+подстрока адреса или имени без учёта регистра (сценарий С-7). Список
+отсортирован по дате регистрации, от новых к старым:
+
+```json
+{
+  "data": [
+    {
+      "id": "clx8a1p...",
+      "email": "anna@example.com",
+      "name": "Анна",
+      "role": "USER",
+      "isBlocked": false,
+      "createdAt": "2026-02-01T10:00:00.000Z",
+      "transactionCount": 128
+    }
+  ],
+  "meta": { "page": 1, "pageSize": 50, "total": 1, "totalPages": 1 }
+}
+```
+
+`PATCH` принимает `role`, `isBlocked` или оба поля; пустое тело отклоняется
+как `VALIDATION_FAILED`. Ответ — та же запись без `transactionCount`.
+
+`GET /api/v1/admin/stats` отдаёт один объект: распределение регистраций —
+за последние 30 дней по календарным датам, день без регистраций возвращается
+с нулём, а не пропускается:
+
+```json
+{
+  "userCount": 7,
+  "transactionCount": 340,
+  "registrations": [{ "date": "2026-02-10", "count": 1 }]
+}
+```
+
+`POST /api/v1/admin/rates/refresh` вызывает ту же `refreshRates`, что
+и маршрут по расписанию, за текущую дату, и отдаёт `{ "dates": 1, "rates": 4 }`.
+
+Ошибки: `FORBIDDEN`, `SELF_MODIFICATION_FORBIDDEN`, `NOT_FOUND`,
+`VALIDATION_FAILED`.
 
 ### 6.10. Спецификация
 
