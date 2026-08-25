@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   type LucideIcon,
   Receipt,
+  Shield,
   Tags,
   Target,
   Wallet,
@@ -18,13 +19,16 @@ type NavigationKey =
   | "wallets"
   | "transactions"
   | "categories"
-  | "budgets";
+  | "budgets"
+  | "admin";
 
-const navigation: readonly {
+type NavigationItem = {
   href: string;
   key: NavigationKey;
   icon: LucideIcon;
-}[] = [
+};
+
+const navigation: readonly NavigationItem[] = [
   { href: "/", key: "overview", icon: LayoutDashboard },
   { href: "/wallets", key: "wallets", icon: Wallet },
   { href: "/transactions", key: "transactions", icon: Receipt },
@@ -32,13 +36,20 @@ const navigation: readonly {
   { href: "/budgets", key: "budgets", icon: Target },
 ];
 
-function AppNav() {
+const administration: NavigationItem = {
+  href: "/admin",
+  key: "admin",
+  icon: Shield,
+};
+
+function AppNav({ isAdmin }: { isAdmin: boolean }) {
   const t = useTranslations("navigation");
   const pathname = usePathname();
+  const items = isAdmin ? [...navigation, administration] : navigation;
 
   return (
     <nav className="flex flex-col gap-0.5">
-      {navigation.map(({ href, key, icon: Icon }) => {
+      {items.map(({ href, key, icon: Icon }) => {
         const current =
           href === "/" ? pathname === "/" : pathname.startsWith(href);
 

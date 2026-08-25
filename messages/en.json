@@ -62,7 +62,8 @@
     "wallets": "Wallets",
     "categories": "Categories",
     "transactions": "Transactions",
-    "budgets": "Budgets"
+    "budgets": "Budgets",
+    "admin": "Administration"
   },
   "dashboard": {
     "title": "Overview",
@@ -506,5 +507,67 @@
     "totalBalance": "Total balance",
     "emptyMessage": "No transactions in the selected period.",
     "emptyAction": "Reset filters"
+  },
+  "admin": {
+    "title": "Administration",
+    "empty": "No accounts found.",
+    "self": "Your account",
+    "sections": {
+      "accounts": "Accounts",
+      "registrations": "Registrations over 30 days"
+    },
+    "figures": {
+      "users": "Accounts",
+      "transactions": "Transactions in the system"
+    },
+    "filters": {
+      "search": "Search by email or name",
+      "apply": "Search"
+    },
+    "columns": {
+      "email": "Email",
+      "name": "Name",
+      "role": "Role",
+      "createdAt": "Registered",
+      "status": "Status",
+      "transactions": "Transactions",
+      "actions": "Actions"
+    },
+    "roles": {
+      "USER": "User",
+      "ADMIN": "Administrator"
+    },
+    "status": {
+      "active": "Active",
+      "blocked": "Blocked"
+    },
+    "registrations": {
+      "count": "{count} registrations"
+    },
+    "rates": {
+      "refreshed": "Rates refreshed, {count} records",
+      "failed": "Could not reach the National Bank"
+    },
+    "actions": {
+      "refreshRates": "Refresh rates",
+      "block": "Block",
+      "unblock": "Unblock",
+      "makeRole": {
+        "ADMIN": "Make administrator",
+        "USER": "Make user"
+      },
+      "retry": "Retry"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "position": "Page {page} of {totalPages}"
+    },
+    "errors": {
+      "SELF_MODIFICATION_FORBIDDEN": "You cannot modify your own account",
+      "NOT_FOUND": "Account not found",
+      "VALIDATION_FAILED": "Check the submitted fields",
+      "unexpected": "Could not load the administration section"
+    }
   }
 }

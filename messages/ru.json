@@ -62,7 +62,8 @@
     "wallets": "Счета",
     "categories": "Категории",
     "transactions": "Операции",
-    "budgets": "Бюджеты"
+    "budgets": "Бюджеты",
+    "admin": "Администрирование"
   },
   "dashboard": {
     "title": "Обзор",
@@ -506,5 +507,67 @@
     "totalBalance": "Общий баланс",
     "emptyMessage": "За выбранный период операций нет.",
     "emptyAction": "Сбросить фильтры"
+  },
+  "admin": {
+    "title": "Администрирование",
+    "empty": "Учётные записи не найдены.",
+    "self": "Ваша запись",
+    "sections": {
+      "accounts": "Учётные записи",
+      "registrations": "Регистрации за 30 дней"
+    },
+    "figures": {
+      "users": "Учётных записей",
+      "transactions": "Операций в системе"
+    },
+    "filters": {
+      "search": "Поиск по адресу или имени",
+      "apply": "Найти"
+    },
+    "columns": {
+      "email": "Адрес",
+      "name": "Имя",
+      "role": "Роль",
+      "createdAt": "Регистрация",
+      "status": "Статус",
+      "transactions": "Операций",
+      "actions": "Действия"
+    },
+    "roles": {
+      "USER": "Пользователь",
+      "ADMIN": "Администратор"
+    },
+    "status": {
+      "active": "Активна",
+      "blocked": "Заблокирована"
+    },
+    "registrations": {
+      "count": "Регистраций: {count}"
+    },
+    "rates": {
+      "refreshed": "Курсы обновлены, записей: {count}",
+      "failed": "Не удалось получить курсы Национального банка"
+    },
+    "actions": {
+      "refreshRates": "Обновить курсы",
+      "block": "Заблокировать",
+      "unblock": "Разблокировать",
+      "makeRole": {
+        "ADMIN": "Сделать администратором",
+        "USER": "Сделать пользователем"
+      },
+      "retry": "Повторить"
+    },
+    "pagination": {
+      "previous": "Назад",
+      "next": "Вперёд",
+      "position": "Страница {page} из {totalPages}"
+    },
+    "errors": {
+      "SELF_MODIFICATION_FORBIDDEN": "Собственную учётную запись изменить нельзя",
+      "NOT_FOUND": "Учётная запись не найдена",
+      "VALIDATION_FAILED": "Проверьте заполненные поля",
+      "unexpected": "Не удалось загрузить раздел администрирования"
+    }
   }
 }

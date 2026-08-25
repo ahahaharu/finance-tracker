@@ -6,6 +6,7 @@ import { Link, redirect } from "@/i18n/navigation";
 import { toLocale } from "@/i18n/routing";
 import { requireUser } from "@/lib/auth/guards";
 import { isDomainError } from "@/lib/errors";
+import { Role } from "@/lib/generated/prisma/enums";
 import type { AuthenticatedUser } from "@/lib/services/auth";
 
 import { AppNav } from "./app-nav";
@@ -47,7 +48,7 @@ export default async function AppLayout({
           >
             {t("title")}
           </Link>
-          <AppNav />
+          <AppNav isAdmin={user.role === Role.ADMIN} />
         </div>
 
         <div className="flex items-center gap-2 border-t border-line p-3">
