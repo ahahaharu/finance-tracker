@@ -3,11 +3,14 @@ import { setRequestLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { toLocale } from "@/i18n/routing";
 import { hasActiveUser } from "@/lib/auth/guards";
+import { decodeFailure } from "@/lib/forms/state";
 
+import { authFormErrorCodes } from "../failure";
 import { RegisterForm } from "../register-form";
 
 export default async function RegisterPage({
   params,
+  searchParams,
 }: PageProps<"/[locale]/register">) {
   const locale = toLocale((await params).locale);
 
@@ -17,5 +20,9 @@ export default async function RegisterPage({
     return redirect({ href: "/", locale });
   }
 
-  return <RegisterForm />;
+  return (
+    <RegisterForm
+      initialState={decodeFailure(await searchParams, authFormErrorCodes)}
+    />
+  );
 }

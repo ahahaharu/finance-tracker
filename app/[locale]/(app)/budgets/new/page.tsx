@@ -3,10 +3,12 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { toLocale } from "@/i18n/routing";
 import { requireUser } from "@/lib/auth/guards";
+import { decodeFailure } from "@/lib/forms/state";
 import { listCategories } from "@/lib/services/category";
 
 import { createBudgetAction } from "../actions";
 import { BudgetForm } from "../budget-form";
+import { budgetFormErrorCodes } from "../failure";
 
 const monthPattern = /^\d{4}-(0[1-9]|1[0-2])$/;
 
@@ -41,6 +43,7 @@ export default async function NewBudgetPage({
           action={createBudgetAction.bind(null, locale)}
           categories={categories.items}
           month={month}
+          initialState={decodeFailure(query, budgetFormErrorCodes)}
         />
       )}
     </div>

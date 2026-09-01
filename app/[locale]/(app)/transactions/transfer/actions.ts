@@ -8,27 +8,19 @@ import { redirect } from "@/i18n/navigation";
 import { requireUser } from "@/lib/auth/guards";
 import { type ErrorCode, isDomainError } from "@/lib/errors";
 import { parseMoney } from "@/lib/format/money";
+import { formFailure } from "@/lib/forms/failure";
 import { createTransferSchema } from "@/lib/schemas/transfer";
 import { transactionContext } from "@/lib/services/transaction";
 import { createTransfer, deleteTransfer } from "@/lib/services/transfer";
 
-const formErrorCodes = [
-  "VALIDATION_FAILED",
-  "SAME_WALLET_TRANSFER",
-  "FUTURE_DATE",
-  "RATE_NOT_AVAILABLE",
-  "NOT_FOUND",
-] as const;
-
-export type TransferFormErrorCode = (typeof formErrorCodes)[number];
-
-export type TransferFormState = {
-  code?: TransferFormErrorCode;
-  invalid?: string[];
-};
+import {
+  type TransferFormErrorCode,
+  transferFormErrorCodes,
+  type TransferFormState,
+} from "./failure";
 
 function isFormErrorCode(code: ErrorCode): code is TransferFormErrorCode {
-  return (formErrorCodes as readonly ErrorCode[]).includes(code);
+  return (transferFormErrorCodes as readonly ErrorCode[]).includes(code);
 }
 
 function invalidFields(error: ZodError): string[] {
@@ -60,10 +52,10 @@ export async function createTransferAction(
   const occurredAt = String(formData.get("occurredAt") ?? "");
 
   if (amountFrom === null || amountTo === null) {
-    return {
+    return formFailure(locale, formData, {
       code: "VALIDATION_FAILED",
       invalid: amountFrom === null ? ["amountFrom"] : ["amountTo"],
-    };
+    });
   }
 
   const input = createTransferSchema.safeParse({
@@ -76,13 +68,16 @@ export async function createTransferAction(
   });
 
   if (!input.success) {
-    return { code: "VALIDATION_FAILED", invalid: invalidFields(input.error) };
+    return formFailure(locale, formData, {
+      code: "VALIDATION_FAILED",
+      invalid: invalidFields(input.error),
+    });
   }
 
   try {
     await createTransfer(user.id, input.data, transactionContext(user));
   } catch (error) {
-    return toFormState(error);
+    return formFailure(locale, formData, toFormState(error));
   }
 
   revalidatePath(`/${locale}/transactions`);

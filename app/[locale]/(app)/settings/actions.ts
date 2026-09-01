@@ -7,29 +7,21 @@ import type { ZodError } from "zod";
 import { redirect } from "@/i18n/navigation";
 import { requireUser } from "@/lib/auth/guards";
 import { type ErrorCode, isDomainError } from "@/lib/errors";
+import { formFailure } from "@/lib/forms/failure";
 import {
   changePasswordSchema,
   updateProfileSchema,
 } from "@/lib/schemas/profile";
 import { changePassword, updateProfile } from "@/lib/services/profile";
 
-const formErrorCodes = [
-  "VALIDATION_FAILED",
-  "INVALID_CREDENTIALS",
-  "RATE_NOT_AVAILABLE",
-  "NOT_FOUND",
-] as const;
-
-export type SettingsErrorCode = (typeof formErrorCodes)[number];
-
-export type SettingsFormState = {
-  code?: SettingsErrorCode;
-  invalid?: string[];
-  saved?: boolean;
-};
+import {
+  type SettingsErrorCode,
+  settingsFormErrorCodes,
+  type SettingsFormState,
+} from "./failure";
 
 function isFormErrorCode(code: ErrorCode): code is SettingsErrorCode {
-  return (formErrorCodes as readonly ErrorCode[]).includes(code);
+  return (settingsFormErrorCodes as readonly ErrorCode[]).includes(code);
 }
 
 function invalidFields(error: ZodError): string[] {
@@ -56,13 +48,16 @@ export async function updateProfileAction(
   });
 
   if (!input.success) {
-    return { code: "VALIDATION_FAILED", invalid: invalidFields(input.error) };
+    return formFailure(locale, formData, {
+      code: "VALIDATION_FAILED",
+      invalid: invalidFields(input.error),
+    });
   }
 
   try {
     await updateProfile(user.id, input.data);
   } catch (error) {
-    return toFormState(error);
+    return formFailure(locale, formData, toFormState(error));
   }
 
   revalidatePath(`/${locale}`, "layout");
@@ -85,13 +80,16 @@ export async function changeCurrencyAction(
   });
 
   if (!input.success) {
-    return { code: "VALIDATION_FAILED", invalid: invalidFields(input.error) };
+    return formFailure(locale, formData, {
+      code: "VALIDATION_FAILED",
+      invalid: invalidFields(input.error),
+    });
   }
 
   try {
     await updateProfile(user.id, input.data);
   } catch (error) {
-    return toFormState(error);
+    return formFailure(locale, formData, toFormState(error));
   }
 
   revalidatePath(`/${locale}`, "layout");
@@ -100,7 +98,7 @@ export async function changeCurrencyAction(
 }
 
 export async function changePasswordAction(
-  _locale: Locale,
+  locale: Locale,
   _state: SettingsFormState,
   formData: FormData,
 ): Promise<SettingsFormState> {
@@ -111,13 +109,16 @@ export async function changePasswordAction(
   });
 
   if (!input.success) {
-    return { code: "VALIDATION_FAILED", invalid: invalidFields(input.error) };
+    return formFailure(locale, formData, {
+      code: "VALIDATION_FAILED",
+      invalid: invalidFields(input.error),
+    });
   }
 
   try {
     await changePassword(user.id, input.data);
   } catch (error) {
-    return toFormState(error);
+    return formFailure(locale, formData, toFormState(error));
   }
 
   return { saved: true };

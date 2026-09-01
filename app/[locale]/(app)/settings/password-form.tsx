@@ -4,19 +4,20 @@ import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
+import { FormFallback } from "@/components/form-fallback";
 import { Input } from "@/components/ui/input";
 
-import type { SettingsFormState } from "./actions";
-
-const initialState: SettingsFormState = {};
+import type { SettingsFormState } from "./failure";
 
 function PasswordForm({
   action,
+  initialState,
 }: {
   action: (
     state: SettingsFormState,
     formData: FormData,
   ) => Promise<SettingsFormState>;
+  initialState: SettingsFormState;
 }) {
   const t = useTranslations("settings");
   const [state, formAction, pending] = useActionState(action, initialState);
@@ -27,6 +28,7 @@ function PasswordForm({
       className="flex w-full max-w-[320px] flex-col gap-4"
       noValidate
     >
+      <FormFallback scope="password" />
       <Input
         name="currentPassword"
         type="password"

@@ -1,6 +1,19 @@
-import type { WalletFormErrorCode } from "./actions";
+import type { SearchParams } from "@/lib/forms/state";
 
-export type SearchParams = Record<string, string | string[] | undefined>;
+export const walletFormErrorCodes = [
+  "VALIDATION_FAILED",
+  "WALLET_NAME_TAKEN",
+  "WALLET_HAS_TRANSACTIONS",
+  "NOT_FOUND",
+] as const;
+
+export type WalletFormErrorCode = (typeof walletFormErrorCodes)[number];
+
+export type WalletFormState = {
+  code?: WalletFormErrorCode;
+  invalid?: string[];
+  transactionCount?: number;
+};
 
 export type Failure = {
   code: WalletFormErrorCode;

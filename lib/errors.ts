@@ -141,6 +141,14 @@ export class SelfModificationForbiddenError extends DomainError {
   }
 }
 
+export class RateLimitedError extends DomainError {
+  constructor(retryAfterSeconds: number) {
+    super("RATE_LIMITED", "Too many attempts from this address", {
+      retryAfterSeconds,
+    });
+  }
+}
+
 export class NotFoundError extends DomainError {
   constructor() {
     super("NOT_FOUND", "Resource does not exist or belongs to another user");

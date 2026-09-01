@@ -5,13 +5,13 @@ import { useLocale, useTranslations } from "next-intl";
 
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { FormFallback } from "@/components/form-fallback";
 import { Input } from "@/components/ui/input";
 
-import { type AuthFormState, loginAction } from "./actions";
+import { loginAction } from "./actions";
+import type { AuthFormState } from "./failure";
 
-const initialState: AuthFormState = {};
-
-function LoginForm() {
+function LoginForm({ initialState }: { initialState: AuthFormState }) {
   const t = useTranslations("auth");
   const locale = useLocale();
   const [email, setEmail] = useState("");
@@ -25,6 +25,7 @@ function LoginForm() {
       <h1 className="text-20 font-medium">{t("login.title")}</h1>
 
       <form action={formAction} className="flex flex-col gap-4" noValidate>
+        <FormFallback />
         <Input
           name="email"
           type="email"

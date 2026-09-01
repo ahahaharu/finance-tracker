@@ -22,7 +22,7 @@ export default async function BudgetsPage({
 
   const query = await searchParams;
   const month = readMonth(query);
-  const failed = single(query.error) !== undefined;
+  const failed = single(query.budgetId) !== undefined;
   const [t, formatter] = await Promise.all([
     getTranslations("budgets"),
     getFormatter(),

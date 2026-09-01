@@ -49,7 +49,8 @@
       "VALIDATION_FAILED": "Check the fields above",
       "EMAIL_TAKEN": "This address is already registered",
       "INVALID_CREDENTIALS": "Wrong email or password",
-      "ACCOUNT_BLOCKED": "This account is blocked. Contact an administrator"
+      "ACCOUNT_BLOCKED": "This account is blocked. Contact an administrator",
+      "RATE_LIMITED": "Too many attempts. Try again in a few minutes"
     },
     "signOut": "Sign out",
     "session": {
@@ -617,5 +618,14 @@
       "NOT_FOUND": "Account not found",
       "unexpected": "Could not load the settings"
     }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "This page does not exist or belongs to another user",
+    "home": "Go to overview"
+  },
+  "error": {
+    "unexpected": "Something went wrong. Please try again",
+    "retry": "Retry"
   }
 }

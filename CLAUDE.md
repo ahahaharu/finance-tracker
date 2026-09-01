@@ -51,6 +51,7 @@ lib/api/**              REST response and error mapping shared by handlers.
 lib/services/**         ALL business logic. Unit tests live next to it.
 lib/repositories/**     The only place allowed to call prisma.*
 lib/schemas/**          Zod schemas — shared by API, actions and forms.
+lib/forms/**            Form failure state shared by server actions and pages.
 lib/auth/**             Auth.js config, session helpers, guards.
 prisma/                 schema.prisma, migrations, seed.ts
 scripts/                one-off maintenance scripts run through pnpm

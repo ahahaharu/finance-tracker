@@ -5,6 +5,7 @@ import { Amount } from "@/components/ui/amount";
 import { toLocale } from "@/i18n/routing";
 import { requireUser } from "@/lib/auth/guards";
 import { NotFoundError } from "@/lib/errors";
+import { decodeFailure } from "@/lib/forms/state";
 import {
   balanceOptions,
   getWallet,
@@ -12,10 +13,12 @@ import {
 } from "@/lib/services/wallet";
 
 import { updateWalletAction } from "../actions";
+import { walletFormErrorCodes } from "../failure";
 import { WalletForm } from "../wallet-form";
 
 export default async function WalletPage({
   params,
+  searchParams,
 }: PageProps<"/[locale]/wallets/[id]">) {
   const { locale: rawLocale, id } = await params;
   const locale = toLocale(rawLocale);
@@ -52,6 +55,7 @@ export default async function WalletPage({
       <WalletForm
         action={updateWalletAction.bind(null, locale, wallet.id)}
         wallet={wallet}
+        initialState={decodeFailure(await searchParams, walletFormErrorCodes)}
       />
     </div>
   );

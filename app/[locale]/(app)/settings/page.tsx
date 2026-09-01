@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SectionTitle } from "@/components/ui/section-title";
 import { toLocale } from "@/i18n/routing";
 import { requireUser } from "@/lib/auth/guards";
+import { decodeFailure } from "@/lib/forms/state";
 import { getProfile } from "@/lib/services/profile";
 
 import {
@@ -11,17 +12,20 @@ import {
   updateProfileAction,
 } from "./actions";
 import { CurrencyForm } from "./currency-form";
+import { settingsFormErrorCodes } from "./failure";
 import { PasswordForm } from "./password-form";
 import { ProfileForm } from "./profile-form";
 
 export default async function SettingsPage({
   params,
+  searchParams,
 }: PageProps<"/[locale]/settings">) {
   const locale = toLocale((await params).locale);
 
   setRequestLocale(locale);
 
   const user = await requireUser();
+  const query = await searchParams;
   const [profile, t] = await Promise.all([
     getProfile(user.id),
     getTranslations("settings"),
@@ -40,6 +44,7 @@ export default async function SettingsPage({
           action={updateProfileAction.bind(null, locale)}
           name={profile.name}
           locale={profile.locale}
+          initialState={decodeFailure(query, settingsFormErrorCodes, "profile")}
         />
       </section>
 
@@ -48,12 +53,16 @@ export default async function SettingsPage({
         <CurrencyForm
           action={changeCurrencyAction.bind(null, locale)}
           baseCurrency={profile.baseCurrency}
+          initialState={decodeFailure(query, settingsFormErrorCodes, "currency")}
         />
       </section>
 
       <section className="flex flex-col gap-3 border-t border-line pt-6">
         <SectionTitle>{t("sections.password")}</SectionTitle>
-        <PasswordForm action={changePasswordAction.bind(null, locale)} />
+        <PasswordForm
+          action={changePasswordAction.bind(null, locale)}
+          initialState={decodeFailure(query, settingsFormErrorCodes, "password")}
+        />
       </section>
     </div>
   );

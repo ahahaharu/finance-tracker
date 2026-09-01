@@ -3,7 +3,10 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { toLocale } from "@/i18n/routing";
 import { CategoryKind } from "@/lib/generated/prisma/enums";
 
+import { decodeFailure } from "@/lib/forms/state";
+
 import { createCategoryAction } from "../actions";
+import { categoryFormErrorCodes } from "../failure";
 import { CategoryForm } from "../category-form";
 
 export default async function NewCategoryPage({
@@ -27,6 +30,7 @@ export default async function NewCategoryPage({
       <CategoryForm
         action={createCategoryAction.bind(null, locale)}
         defaultKind={defaultKind}
+        initialState={decodeFailure(query, categoryFormErrorCodes)}
       />
     </div>
   );

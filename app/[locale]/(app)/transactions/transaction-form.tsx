@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
+import { FormFallback } from "@/components/form-fallback";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Link } from "@/i18n/navigation";
@@ -13,7 +14,7 @@ import { toMoneyInput } from "@/lib/format/money";
 import { entryTypes } from "@/lib/schemas/transaction";
 import { cn } from "@/lib/utils";
 
-import type { TransactionFormState } from "./actions";
+import type { TransactionFormState } from "./failure";
 
 type WalletOption = { id: string; name: string; currency: Currency };
 type CategoryOption = { id: string; name: string; kind: CategoryKind };
@@ -37,9 +38,8 @@ type TransactionFormProps = {
   transaction?: TransactionValues;
   now: string;
   variant?: "row" | "column";
+  initialState: TransactionFormState;
 };
-
-const initialState: TransactionFormState = {};
 
 function TransactionForm({
   action,
@@ -48,6 +48,7 @@ function TransactionForm({
   transaction,
   now,
   variant = "column",
+  initialState,
 }: TransactionFormProps) {
   const t = useTranslations("transactions");
   const [type, setType] = useState<string>(transaction?.type ?? "EXPENSE");
@@ -89,6 +90,7 @@ function TransactionForm({
       )}
       noValidate
     >
+      <FormFallback />
       <Select
         name="type"
         value={type}

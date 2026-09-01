@@ -6,6 +6,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { toLocale } from "@/i18n/routing";
 import { requireUser } from "@/lib/auth/guards";
 import { NotFoundError } from "@/lib/errors";
+import { decodeFailure } from "@/lib/forms/state";
 import { listCategories } from "@/lib/services/category";
 import {
   getTransaction,
@@ -16,6 +17,7 @@ import { balanceOptions, listWallets } from "@/lib/services/wallet";
 import { cn } from "@/lib/utils";
 
 import { deleteTransactionAction, updateTransactionAction } from "../actions";
+import { transactionFormErrorCodes } from "../failure";
 import { TransactionForm } from "../transaction-form";
 import { TransferDetails } from "../transfer-details";
 
@@ -23,6 +25,7 @@ const rateDateFormat = { day: "numeric", month: "long", year: "numeric" } as con
 
 export default async function TransactionPage({
   params,
+  searchParams,
 }: PageProps<"/[locale]/transactions/[id]">) {
   const { locale: rawLocale, id } = await params;
   const locale = toLocale(rawLocale);
@@ -78,6 +81,7 @@ export default async function TransactionPage({
           note: transaction.note,
         }}
         now={format(new Date(), "yyyy-MM-dd'T'HH:mm")}
+        initialState={decodeFailure(await searchParams, transactionFormErrorCodes)}
       />
 
       <dl className="flex flex-col gap-2">

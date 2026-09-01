@@ -7,10 +7,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@/i18n/navigation";
 import { toLocale } from "@/i18n/routing";
 import { requireUser } from "@/lib/auth/guards";
+import { decodeFailure } from "@/lib/forms/state";
 import { listCategories } from "@/lib/services/category";
 import { balanceOptions, listWallets } from "@/lib/services/wallet";
 
 import { createTransactionAction } from "./actions";
+import { deleteFailed, transactionFormErrorCodes } from "./failure";
 import { FilterBar } from "./filter-bar";
 import { readFilter, readPage, toQueryString } from "./query";
 import { TransactionForm } from "./transaction-form";
@@ -27,7 +29,7 @@ export default async function TransactionsPage({
   const query = await searchParams;
   const filter = readFilter(query);
   const page = readPage(query);
-  const failed = query.error !== undefined;
+  const failed = deleteFailed(query);
 
   const user = await requireUser();
   const [wallets, categories, t] = await Promise.all([
@@ -63,6 +65,7 @@ export default async function TransactionsPage({
           categories={categories.items}
           now={format(new Date(), "yyyy-MM-dd'T'HH:mm")}
           variant="row"
+          initialState={decodeFailure(query, transactionFormErrorCodes)}
         />
       ) : (
         <p className="text-13 text-ink-muted">{t("needsWalletAndCategory")}</p>
