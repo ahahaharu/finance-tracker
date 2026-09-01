@@ -5,20 +5,20 @@ import { useLocale, useTranslations } from "next-intl";
 
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { FormFallback } from "@/components/form-fallback";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Currency } from "@/lib/generated/prisma/enums";
 
-import { type AuthFormState, registerAction } from "./actions";
-
-const initialState: AuthFormState = {};
+import { registerAction } from "./actions";
+import type { AuthFormState } from "./failure";
 
 const currencyOptions = Object.values(Currency).map((currency) => ({
   value: currency,
   label: currency,
 }));
 
-function RegisterForm() {
+function RegisterForm({ initialState }: { initialState: AuthFormState }) {
   const t = useTranslations("auth");
   const locale = useLocale();
   const [name, setName] = useState("");
@@ -36,6 +36,7 @@ function RegisterForm() {
       <h1 className="text-20 font-medium">{t("register.title")}</h1>
 
       <form action={formAction} className="flex flex-col gap-4" noValidate>
+        <FormFallback />
         <Input
           name="name"
           autoComplete="name"
@@ -88,6 +89,10 @@ function RegisterForm() {
           />
           <p className="text-12 text-ink-faint">{t("hints.baseCurrency")}</p>
         </div>
+
+        {state.code === "RATE_LIMITED" ? (
+          <p className="text-12 text-negative">{t("errors.RATE_LIMITED")}</p>
+        ) : null}
 
         <Button type="submit" variant="primary" disabled={pending}>
           {t("register.submit")}

@@ -8,6 +8,7 @@ import { redirect } from "@/i18n/navigation";
 import { requireUser } from "@/lib/auth/guards";
 import { type ErrorCode, isDomainError } from "@/lib/errors";
 import { parseMoney } from "@/lib/format/money";
+import { formFailure } from "@/lib/forms/failure";
 import { createWalletSchema, updateWalletSchema } from "@/lib/schemas/wallet";
 import {
   balanceOptions,
@@ -16,23 +17,14 @@ import {
   updateWallet,
 } from "@/lib/services/wallet";
 
-const formErrorCodes = [
-  "VALIDATION_FAILED",
-  "WALLET_NAME_TAKEN",
-  "WALLET_HAS_TRANSACTIONS",
-  "NOT_FOUND",
-] as const;
-
-export type WalletFormErrorCode = (typeof formErrorCodes)[number];
-
-export type WalletFormState = {
-  code?: WalletFormErrorCode;
-  invalid?: string[];
-  transactionCount?: number;
-};
+import {
+  type WalletFormErrorCode,
+  walletFormErrorCodes,
+  type WalletFormState,
+} from "./failure";
 
 function isFormErrorCode(code: ErrorCode): code is WalletFormErrorCode {
-  return (formErrorCodes as readonly ErrorCode[]).includes(code);
+  return (walletFormErrorCodes as readonly ErrorCode[]).includes(code);
 }
 
 function invalidFields(error: ZodError): string[] {
@@ -69,7 +61,10 @@ export async function createWalletAction(
   const initialBalance = readBalance(formData);
 
   if (initialBalance === null) {
-    return { code: "VALIDATION_FAILED", invalid: ["initialBalance"] };
+    return formFailure(locale, formData, {
+      code: "VALIDATION_FAILED",
+      invalid: ["initialBalance"],
+    });
   }
 
   const input = createWalletSchema.safeParse({
@@ -80,16 +75,16 @@ export async function createWalletAction(
   });
 
   if (!input.success) {
-    return {
+    return formFailure(locale, formData, {
       code: "VALIDATION_FAILED",
       invalid: invalidFields(input.error),
-    };
+    });
   }
 
   try {
     await createWallet(user.id, input.data, balanceOptions(user));
   } catch (error) {
-    return toFormState(error);
+    return formFailure(locale, formData, toFormState(error));
   }
 
   revalidatePath(`/${locale}/wallets`);
@@ -107,7 +102,10 @@ export async function updateWalletAction(
   const initialBalance = readBalance(formData);
 
   if (initialBalance === null) {
-    return { code: "VALIDATION_FAILED", invalid: ["initialBalance"] };
+    return formFailure(locale, formData, {
+      code: "VALIDATION_FAILED",
+      invalid: ["initialBalance"],
+    });
   }
 
   const input = updateWalletSchema.safeParse({
@@ -117,16 +115,16 @@ export async function updateWalletAction(
   });
 
   if (!input.success) {
-    return {
+    return formFailure(locale, formData, {
       code: "VALIDATION_FAILED",
       invalid: invalidFields(input.error),
-    };
+    });
   }
 
   try {
     await updateWallet(user.id, walletId, input.data, balanceOptions(user));
   } catch (error) {
-    return toFormState(error);
+    return formFailure(locale, formData, toFormState(error));
   }
 
   revalidatePath(`/${locale}/wallets`);

@@ -4,23 +4,24 @@ import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
+import { FormFallback } from "@/components/form-fallback";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { routing } from "@/i18n/routing";
 
-import type { SettingsFormState } from "./actions";
-
-const initialState: SettingsFormState = {};
+import type { SettingsFormState } from "./failure";
 
 function ProfileForm({
   action,
   name,
   locale,
+  initialState,
 }: {
   action: (
     state: SettingsFormState,
     formData: FormData,
   ) => Promise<SettingsFormState>;
+  initialState: SettingsFormState;
   name: string;
   locale: string;
 }) {
@@ -39,6 +40,7 @@ function ProfileForm({
       className="flex w-full max-w-[320px] flex-col gap-4"
       noValidate
     >
+      <FormFallback scope="profile" />
       <Input
         name="name"
         defaultValue={name}

@@ -44,6 +44,17 @@ export function collection<T>(
   return NextResponse.json({ data, meta });
 }
 
+function retryAfter(
+  code: ErrorCode,
+  details?: Record<string, unknown>,
+): HeadersInit | undefined {
+  if (code !== "RATE_LIMITED" || typeof details?.retryAfterSeconds !== "number") {
+    return undefined;
+  }
+
+  return { "Retry-After": String(details.retryAfterSeconds) };
+}
+
 export function failure(
   code: ErrorCode,
   message: string,
@@ -51,7 +62,7 @@ export function failure(
 ): NextResponse {
   return NextResponse.json(
     { error: { code, message, ...(details ? { details } : {}) } },
-    { status: statusByCode[code] },
+    { status: statusByCode[code], headers: retryAfter(code, details) },
   );
 }
 

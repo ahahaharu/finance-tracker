@@ -7,6 +7,7 @@ import type { ZodError } from "zod";
 import { redirect } from "@/i18n/navigation";
 import { requireUser } from "@/lib/auth/guards";
 import { type ErrorCode, isDomainError } from "@/lib/errors";
+import { formFailure } from "@/lib/forms/failure";
 import {
   createCategorySchema,
   updateCategorySchema,
@@ -17,23 +18,14 @@ import {
   updateCategory,
 } from "@/lib/services/category";
 
-const formErrorCodes = [
-  "VALIDATION_FAILED",
-  "CATEGORY_NAME_TAKEN",
-  "CATEGORY_HAS_TRANSACTIONS",
-  "NOT_FOUND",
-] as const;
-
-export type CategoryFormErrorCode = (typeof formErrorCodes)[number];
-
-export type CategoryFormState = {
-  code?: CategoryFormErrorCode;
-  invalid?: string[];
-  transactionCount?: number;
-};
+import {
+  type CategoryFormErrorCode,
+  categoryFormErrorCodes,
+  type CategoryFormState,
+} from "./failure";
 
 function isFormErrorCode(code: ErrorCode): code is CategoryFormErrorCode {
-  return (formErrorCodes as readonly ErrorCode[]).includes(code);
+  return (categoryFormErrorCodes as readonly ErrorCode[]).includes(code);
 }
 
 function invalidFields(error: ZodError): string[] {
@@ -68,13 +60,16 @@ export async function createCategoryAction(
   });
 
   if (!input.success) {
-    return { code: "VALIDATION_FAILED", invalid: invalidFields(input.error) };
+    return formFailure(locale, formData, {
+      code: "VALIDATION_FAILED",
+      invalid: invalidFields(input.error),
+    });
   }
 
   try {
     await createCategory(user.id, input.data);
   } catch (error) {
-    return toFormState(error);
+    return formFailure(locale, formData, toFormState(error));
   }
 
   revalidatePath(`/${locale}/categories`);
@@ -95,13 +90,16 @@ export async function updateCategoryAction(
   });
 
   if (!input.success) {
-    return { code: "VALIDATION_FAILED", invalid: invalidFields(input.error) };
+    return formFailure(locale, formData, {
+      code: "VALIDATION_FAILED",
+      invalid: invalidFields(input.error),
+    });
   }
 
   try {
     await updateCategory(user.id, categoryId, input.data);
   } catch (error) {
-    return toFormState(error);
+    return formFailure(locale, formData, toFormState(error));
   }
 
   revalidatePath(`/${locale}/categories`);

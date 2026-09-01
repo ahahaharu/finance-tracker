@@ -4,12 +4,13 @@ import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
+import { FormFallback } from "@/components/form-fallback";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Link } from "@/i18n/navigation";
 import type { Currency } from "@/lib/generated/prisma/enums";
 
-import type { TransferFormState } from "./actions";
+import type { TransferFormState } from "./failure";
 
 type WalletOption = { id: string; name: string; currency: Currency };
 
@@ -20,11 +21,15 @@ type TransferFormProps = {
   ) => Promise<TransferFormState>;
   wallets: readonly WalletOption[];
   now: string;
+  initialState: TransferFormState;
 };
 
-const initialState: TransferFormState = {};
-
-function TransferForm({ action, wallets, now }: TransferFormProps) {
+function TransferForm({
+  action,
+  wallets,
+  now,
+  initialState,
+}: TransferFormProps) {
   const t = useTranslations("transfers");
   const [fromWalletId, setFromWalletId] = useState<string>(
     wallets[0]?.id ?? "",
@@ -51,6 +56,7 @@ function TransferForm({ action, wallets, now }: TransferFormProps) {
       className="flex w-full max-w-[320px] flex-col gap-4"
       noValidate
     >
+      <FormFallback />
       <Select
         name="fromWalletId"
         value={fromWalletId}

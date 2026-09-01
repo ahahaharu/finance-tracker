@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { CategoryDot } from "@/components/ui/category-dot";
+import { FormFallback } from "@/components/form-fallback";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Link } from "@/i18n/navigation";
@@ -12,7 +13,7 @@ import { CategoryKind } from "@/lib/generated/prisma/enums";
 import { categoryColors } from "@/lib/schemas/category";
 import { cn } from "@/lib/utils";
 
-import type { CategoryFormState } from "./actions";
+import type { CategoryFormState } from "./failure";
 
 type CategoryValues = {
   name: string;
@@ -27,11 +28,15 @@ type CategoryFormProps = {
   ) => Promise<CategoryFormState>;
   category?: CategoryValues;
   defaultKind?: CategoryKind;
+  initialState: CategoryFormState;
 };
 
-const initialState: CategoryFormState = {};
-
-function CategoryForm({ action, category, defaultKind }: CategoryFormProps) {
+function CategoryForm({
+  action,
+  category,
+  defaultKind,
+  initialState,
+}: CategoryFormProps) {
   const t = useTranslations("categories");
   const [kind, setKind] = useState<string>(
     category?.kind ?? defaultKind ?? CategoryKind.EXPENSE,
@@ -52,6 +57,7 @@ function CategoryForm({ action, category, defaultKind }: CategoryFormProps) {
       className="flex w-full max-w-[320px] flex-col gap-4"
       noValidate
     >
+      <FormFallback />
       <Input
         name="name"
         defaultValue={category?.name}

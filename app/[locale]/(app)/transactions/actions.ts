@@ -8,6 +8,7 @@ import { redirect } from "@/i18n/navigation";
 import { requireUser } from "@/lib/auth/guards";
 import { type ErrorCode, isDomainError } from "@/lib/errors";
 import { parseMoney } from "@/lib/format/money";
+import { formFailure } from "@/lib/forms/failure";
 import {
   createTransactionSchema,
   updateTransactionSchema,
@@ -19,23 +20,14 @@ import {
   updateTransaction,
 } from "@/lib/services/transaction";
 
-const formErrorCodes = [
-  "VALIDATION_FAILED",
-  "CATEGORY_KIND_MISMATCH",
-  "FUTURE_DATE",
-  "RATE_NOT_AVAILABLE",
-  "NOT_FOUND",
-] as const;
-
-export type TransactionFormErrorCode = (typeof formErrorCodes)[number];
-
-export type TransactionFormState = {
-  code?: TransactionFormErrorCode;
-  invalid?: string[];
-};
+import {
+  type TransactionFormErrorCode,
+  transactionFormErrorCodes,
+  type TransactionFormState,
+} from "./failure";
 
 function isFormErrorCode(code: ErrorCode): code is TransactionFormErrorCode {
-  return (formErrorCodes as readonly ErrorCode[]).includes(code);
+  return (transactionFormErrorCodes as readonly ErrorCode[]).includes(code);
 }
 
 function invalidFields(error: ZodError): string[] {
@@ -84,19 +76,25 @@ export async function createTransactionAction(
   const { amount, fields } = readFields(formData);
 
   if (amount === null) {
-    return { code: "VALIDATION_FAILED", invalid: ["amount"] };
+    return formFailure(locale, formData, {
+      code: "VALIDATION_FAILED",
+      invalid: ["amount"],
+    });
   }
 
   const input = createTransactionSchema.safeParse(fields);
 
   if (!input.success) {
-    return { code: "VALIDATION_FAILED", invalid: invalidFields(input.error) };
+    return formFailure(locale, formData, {
+      code: "VALIDATION_FAILED",
+      invalid: invalidFields(input.error),
+    });
   }
 
   try {
     await createTransaction(user.id, input.data, transactionContext(user));
   } catch (error) {
-    return toFormState(error);
+    return formFailure(locale, formData, toFormState(error));
   }
 
   revalidatePath(`/${locale}/transactions`);
@@ -114,13 +112,19 @@ export async function updateTransactionAction(
   const { amount, fields } = readFields(formData);
 
   if (amount === null) {
-    return { code: "VALIDATION_FAILED", invalid: ["amount"] };
+    return formFailure(locale, formData, {
+      code: "VALIDATION_FAILED",
+      invalid: ["amount"],
+    });
   }
 
   const input = updateTransactionSchema.safeParse(fields);
 
   if (!input.success) {
-    return { code: "VALIDATION_FAILED", invalid: invalidFields(input.error) };
+    return formFailure(locale, formData, {
+      code: "VALIDATION_FAILED",
+      invalid: invalidFields(input.error),
+    });
   }
 
   try {
@@ -131,7 +135,7 @@ export async function updateTransactionAction(
       transactionContext(user),
     );
   } catch (error) {
-    return toFormState(error);
+    return formFailure(locale, formData, toFormState(error));
   }
 
   revalidatePath(`/${locale}/transactions`);

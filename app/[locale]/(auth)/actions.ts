@@ -1,35 +1,48 @@
 "use server";
 
+import { headers } from "next/headers";
 import type { Locale } from "next-intl";
 import { AuthError, CredentialsSignin } from "next-auth";
 import type { ZodError } from "zod";
 
 import { redirect } from "@/i18n/navigation";
 import { signIn } from "@/lib/auth";
-import { type ErrorCode, isDomainError } from "@/lib/errors";
+import { type ErrorCode, isDomainError, RateLimitedError } from "@/lib/errors";
+import { formFailure } from "@/lib/forms/failure";
 import { credentialsSchema, registerSchema } from "@/lib/schemas/auth";
 import { registerUser } from "@/lib/services/auth";
+import {
+  attemptKey,
+  clientAddress,
+  consumeAttempt,
+} from "@/lib/services/rate-limit";
 
-const formErrorCodes = [
-  "VALIDATION_FAILED",
-  "EMAIL_TAKEN",
-  "INVALID_CREDENTIALS",
-  "ACCOUNT_BLOCKED",
-] as const;
-
-export type AuthFormErrorCode = (typeof formErrorCodes)[number];
-
-export type AuthFormState = {
-  code?: AuthFormErrorCode;
-  invalid?: string[];
-};
+import {
+  type AuthFormErrorCode,
+  authFormErrorCodes,
+  type AuthFormState,
+} from "./failure";
 
 function isFormErrorCode(code: ErrorCode): code is AuthFormErrorCode {
-  return (formErrorCodes as readonly ErrorCode[]).includes(code);
+  return (authFormErrorCodes as readonly ErrorCode[]).includes(code);
 }
 
 function invalidFields(error: ZodError): string[] {
   return [...new Set(error.issues.map((issue) => String(issue.path[0])))];
+}
+
+async function withinLimit(scope: "login" | "register"): Promise<boolean> {
+  try {
+    consumeAttempt(attemptKey(scope, clientAddress(await headers())));
+
+    return true;
+  } catch (error) {
+    if (error instanceof RateLimitedError) {
+      return false;
+    }
+
+    throw error;
+  }
 }
 
 async function signInWithCredentials(
@@ -57,16 +70,20 @@ export async function loginAction(
   _state: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
+  if (!(await withinLimit("login"))) {
+    return formFailure(locale, formData, { code: "RATE_LIMITED" });
+  }
+
   const parsed = credentialsSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
   });
 
   if (!parsed.success) {
-    return {
+    return formFailure(locale, formData, {
       code: "VALIDATION_FAILED",
       invalid: invalidFields(parsed.error),
-    };
+    });
   }
 
   const failure = await signInWithCredentials(
@@ -75,7 +92,7 @@ export async function loginAction(
   );
 
   if (failure) {
-    return { code: failure };
+    return formFailure(locale, formData, { code: failure });
   }
 
   return redirect({ href: "/", locale });
@@ -86,6 +103,10 @@ export async function registerAction(
   _state: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
+  if (!(await withinLimit("register"))) {
+    return formFailure(locale, formData, { code: "RATE_LIMITED" });
+  }
+
   const parsed = registerSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -94,17 +115,20 @@ export async function registerAction(
   });
 
   if (!parsed.success) {
-    return {
+    return formFailure(locale, formData, {
       code: "VALIDATION_FAILED",
       invalid: invalidFields(parsed.error),
-    };
+    });
   }
 
   try {
     await registerUser(parsed.data, locale);
   } catch (error) {
     if (isDomainError(error) && isFormErrorCode(error.code)) {
-      return { code: error.code, invalid: ["email"] };
+      return formFailure(locale, formData, {
+        code: error.code,
+        invalid: ["email"],
+      });
     }
 
     throw error;

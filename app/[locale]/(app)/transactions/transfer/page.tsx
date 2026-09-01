@@ -3,13 +3,16 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { toLocale } from "@/i18n/routing";
 import { requireUser } from "@/lib/auth/guards";
+import { decodeFailure } from "@/lib/forms/state";
 import { balanceOptions, listWallets } from "@/lib/services/wallet";
 
 import { createTransferAction } from "./actions";
+import { transferFormErrorCodes } from "./failure";
 import { TransferForm } from "./transfer-form";
 
 export default async function NewTransferPage({
   params,
+  searchParams,
 }: PageProps<"/[locale]/transactions/transfer">) {
   const locale = toLocale((await params).locale);
 
@@ -32,6 +35,7 @@ export default async function NewTransferPage({
           action={createTransferAction.bind(null, locale)}
           wallets={wallets.items}
           now={format(new Date(), "yyyy-MM-dd'T'HH:mm")}
+          initialState={decodeFailure(await searchParams, transferFormErrorCodes)}
         />
       )}
     </div>

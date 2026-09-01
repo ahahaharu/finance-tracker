@@ -4,12 +4,13 @@ import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
+import { FormFallback } from "@/components/form-fallback";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Link } from "@/i18n/navigation";
 import { toMoneyInput } from "@/lib/format/money";
 
-import type { BudgetFormState } from "./actions";
+import type { BudgetFormState } from "./failure";
 
 type CategoryOption = { id: string; name: string };
 
@@ -27,11 +28,16 @@ type BudgetFormProps = {
   categories: readonly CategoryOption[];
   month: string;
   budget?: BudgetValues;
+  initialState: BudgetFormState;
 };
 
-const initialState: BudgetFormState = {};
-
-function BudgetForm({ action, categories, month, budget }: BudgetFormProps) {
+function BudgetForm({
+  action,
+  categories,
+  month,
+  budget,
+  initialState,
+}: BudgetFormProps) {
   const t = useTranslations("budgets");
   const [categoryId, setCategoryId] = useState<string>(
     budget?.categoryId ?? categories[0]?.id ?? "",
@@ -49,6 +55,7 @@ function BudgetForm({ action, categories, month, budget }: BudgetFormProps) {
       className="flex w-full max-w-[320px] flex-col gap-4"
       noValidate
     >
+      <FormFallback />
       <input type="hidden" name="month" value={month} />
 
       {budget ? (

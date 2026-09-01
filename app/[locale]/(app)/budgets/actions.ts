@@ -8,6 +8,7 @@ import { redirect } from "@/i18n/navigation";
 import { requireUser } from "@/lib/auth/guards";
 import { type ErrorCode, isDomainError } from "@/lib/errors";
 import { parseMoney } from "@/lib/format/money";
+import { formFailure } from "@/lib/forms/failure";
 import { createBudgetSchema, updateBudgetSchema } from "@/lib/schemas/budget";
 import {
   createBudget,
@@ -15,22 +16,14 @@ import {
   updateBudget,
 } from "@/lib/services/budget";
 
-const formErrorCodes = [
-  "VALIDATION_FAILED",
-  "BUDGET_EXISTS",
-  "CATEGORY_KIND_MISMATCH",
-  "NOT_FOUND",
-] as const;
-
-export type BudgetFormErrorCode = (typeof formErrorCodes)[number];
-
-export type BudgetFormState = {
-  code?: BudgetFormErrorCode;
-  invalid?: string[];
-};
+import {
+  type BudgetFormErrorCode,
+  budgetFormErrorCodes,
+  type BudgetFormState,
+} from "./failure";
 
 function isFormErrorCode(code: ErrorCode): code is BudgetFormErrorCode {
-  return (formErrorCodes as readonly ErrorCode[]).includes(code);
+  return (budgetFormErrorCodes as readonly ErrorCode[]).includes(code);
 }
 
 function invalidFields(error: ZodError): string[] {
@@ -57,7 +50,10 @@ export async function createBudgetAction(
   const limitAmount = parseMoney(String(formData.get("limitAmount") ?? ""));
 
   if (limitAmount === null) {
-    return { code: "VALIDATION_FAILED", invalid: ["limitAmount"] };
+    return formFailure(locale, formData, {
+      code: "VALIDATION_FAILED",
+      invalid: ["limitAmount"],
+    });
   }
 
   const input = createBudgetSchema.safeParse({
@@ -67,13 +63,16 @@ export async function createBudgetAction(
   });
 
   if (!input.success) {
-    return { code: "VALIDATION_FAILED", invalid: invalidFields(input.error) };
+    return formFailure(locale, formData, {
+      code: "VALIDATION_FAILED",
+      invalid: invalidFields(input.error),
+    });
   }
 
   try {
     await createBudget(user.id, input.data, user.baseCurrency);
   } catch (error) {
-    return toFormState(error);
+    return formFailure(locale, formData, toFormState(error));
   }
 
   revalidatePath(`/${locale}/budgets`);
@@ -95,19 +94,25 @@ export async function updateBudgetAction(
   const limitAmount = parseMoney(String(formData.get("limitAmount") ?? ""));
 
   if (limitAmount === null) {
-    return { code: "VALIDATION_FAILED", invalid: ["limitAmount"] };
+    return formFailure(locale, formData, {
+      code: "VALIDATION_FAILED",
+      invalid: ["limitAmount"],
+    });
   }
 
   const input = updateBudgetSchema.safeParse({ limitAmount });
 
   if (!input.success) {
-    return { code: "VALIDATION_FAILED", invalid: invalidFields(input.error) };
+    return formFailure(locale, formData, {
+      code: "VALIDATION_FAILED",
+      invalid: invalidFields(input.error),
+    });
   }
 
   try {
     await updateBudget(user.id, budgetId, input.data);
   } catch (error) {
-    return toFormState(error);
+    return formFailure(locale, formData, toFormState(error));
   }
 
   revalidatePath(`/${locale}/budgets`);

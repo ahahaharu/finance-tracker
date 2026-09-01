@@ -4,13 +4,14 @@ import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
+import { FormFallback } from "@/components/form-fallback";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Link } from "@/i18n/navigation";
 import { toMoneyInput } from "@/lib/format/money";
 import { Currency, WalletType } from "@/lib/generated/prisma/enums";
 
-import type { WalletFormState } from "./actions";
+import type { WalletFormState } from "./failure";
 
 type WalletValues = {
   name: string;
@@ -25,11 +26,10 @@ type WalletFormProps = {
     formData: FormData,
   ) => Promise<WalletFormState>;
   wallet?: WalletValues;
+  initialState: WalletFormState;
 };
 
-const initialState: WalletFormState = {};
-
-function WalletForm({ action, wallet }: WalletFormProps) {
+function WalletForm({ action, wallet, initialState }: WalletFormProps) {
   const t = useTranslations("wallets");
   const [type, setType] = useState<string>(wallet?.type ?? WalletType.CASH);
   const [currency, setCurrency] = useState<string>(
@@ -53,6 +53,7 @@ function WalletForm({ action, wallet }: WalletFormProps) {
       className="flex w-full max-w-[320px] flex-col gap-4"
       noValidate
     >
+      <FormFallback />
       <Input
         name="name"
         defaultValue={wallet?.name}

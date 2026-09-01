@@ -1,8 +1,21 @@
 import { CategoryKind } from "@/lib/generated/prisma/enums";
 
-import type { CategoryFormErrorCode } from "./actions";
-
 export type SearchParams = Record<string, string | string[] | undefined>;
+
+export const categoryFormErrorCodes = [
+  "VALIDATION_FAILED",
+  "CATEGORY_NAME_TAKEN",
+  "CATEGORY_HAS_TRANSACTIONS",
+  "NOT_FOUND",
+] as const;
+
+export type CategoryFormErrorCode = (typeof categoryFormErrorCodes)[number];
+
+export type CategoryFormState = {
+  code?: CategoryFormErrorCode;
+  invalid?: string[];
+  transactionCount?: number;
+};
 
 export type Failure = {
   code: CategoryFormErrorCode;

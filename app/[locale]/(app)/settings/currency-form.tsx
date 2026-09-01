@@ -4,22 +4,23 @@ import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { Button, buttonVariants } from "@/components/ui/button";
+import { FormFallback } from "@/components/form-fallback";
 import { Select } from "@/components/ui/select";
 import { Currency } from "@/lib/generated/prisma/enums";
 import { cn } from "@/lib/utils";
 
-import type { SettingsFormState } from "./actions";
-
-const initialState: SettingsFormState = {};
+import type { SettingsFormState } from "./failure";
 
 function CurrencyForm({
   action,
   baseCurrency,
+  initialState,
 }: {
   action: (
     state: SettingsFormState,
     formData: FormData,
   ) => Promise<SettingsFormState>;
+  initialState: SettingsFormState;
   baseCurrency: Currency;
 }) {
   const t = useTranslations("settings");
@@ -37,6 +38,7 @@ function CurrencyForm({
       className="flex w-full max-w-[320px] flex-col gap-4"
       noValidate
     >
+      <FormFallback scope="currency" />
       <Select
         name="baseCurrency"
         value={currency}
