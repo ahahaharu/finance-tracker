@@ -11,6 +11,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
 FROM base AS builder
+ENV BUILD_STANDALONE=true
 ENV DISABLE_ERD=true
 ENV DATABASE_URL=postgresql://postgres:postgres@postgres:5432/finance_tracker
 COPY --from=deps /app/node_modules ./node_modules
