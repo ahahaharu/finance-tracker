@@ -158,6 +158,8 @@ pnpm db:up            # docker compose up -d postgres
 pnpm db:migrate       # prisma migrate dev
 pnpm db:seed          # demo data
 pnpm db:studio        # prisma studio
+pnpm docker:up        # app and database in containers
+pnpm docker:down      # stop them
 ```
 
 ## Git

@@ -14,7 +14,9 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
     "rates:refresh": "tsx scripts/refresh-rates.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "docker:up": "docker compose -f docker-compose.prod.yml up --build",
+    "docker:down": "docker compose -f docker-compose.prod.yml down"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
