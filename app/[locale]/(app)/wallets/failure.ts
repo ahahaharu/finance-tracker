@@ -15,9 +15,8 @@ export type WalletFormState = {
   transactionCount?: number;
 };
 
-export type Failure = {
+export type DeleteFailure = {
   code: WalletFormErrorCode;
-  walletId: string;
   count: number;
 };
 
@@ -30,13 +29,12 @@ function single(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
 }
 
-export function readFailure(query: SearchParams): Failure | null {
+export function readDeleteFailure(query: SearchParams): DeleteFailure | null {
   const code = deleteErrorCodes.find((known) => known === single(query.error));
-  const walletId = single(query.walletId);
 
-  if (!code || !walletId) {
+  if (!code) {
     return null;
   }
 
-  return { code, walletId, count: Number(single(query.count) ?? 0) };
+  return { code, count: Number(single(query.count) ?? 0) };
 }

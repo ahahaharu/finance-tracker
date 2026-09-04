@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+import { LinkPending } from "@/components/ui/link-pending";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -70,6 +71,7 @@ function AppNav({ isAdmin }: { isAdmin: boolean }) {
           >
             <Icon className="size-4 shrink-0" aria-hidden />
             {t(key)}
+            <LinkPending className="ml-auto" />
           </Link>
         );
       })}

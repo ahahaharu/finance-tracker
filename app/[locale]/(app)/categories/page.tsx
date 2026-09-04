@@ -2,13 +2,14 @@ import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { buttonVariants } from "@/components/ui/button";
+import { LinkPending } from "@/components/ui/link-pending";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@/i18n/navigation";
 import { toLocale } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 
 import { CategoriesList } from "./categories-list";
-import { kinds, readFailure, readKind } from "./failure";
+import { kinds, readKind } from "./failure";
 
 export default async function CategoriesPage({
   params,
@@ -20,7 +21,6 @@ export default async function CategoriesPage({
 
   const query = await searchParams;
   const kind = readKind(query);
-  const failure = readFailure(query);
   const t = await getTranslations("categories");
 
   return (
@@ -32,6 +32,7 @@ export default async function CategoriesPage({
           className={buttonVariants({ variant: "primary" })}
         >
           {t("add")}
+          <LinkPending />
         </Link>
       </div>
 
@@ -62,7 +63,7 @@ export default async function CategoriesPage({
       </nav>
 
       <Suspense fallback={<Skeleton rows={6} columns={3} />}>
-        <CategoriesList locale={locale} kind={kind} failure={failure} />
+        <CategoriesList kind={kind} />
       </Suspense>
     </div>
   );

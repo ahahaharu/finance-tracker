@@ -1,7 +1,10 @@
 import { Suspense } from "react";
+import { format } from "date-fns";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 
 import { buttonVariants } from "@/components/ui/button";
+import { LinkPending } from "@/components/ui/link-pending";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@/i18n/navigation";
 import { toLocale } from "@/i18n/routing";
@@ -30,32 +33,45 @@ export default async function BudgetsPage({
 
   return (
     <div className="flex flex-col gap-section">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         <h1 className="text-20 font-medium">{t("title")}</h1>
         <Link
           href={{ pathname: "/budgets/new", query: { month } }}
           className={buttonVariants({ variant: "primary" })}
         >
           {t("add")}
+          <LinkPending />
         </Link>
       </div>
 
-      <nav className="flex items-center gap-3 text-13">
+      <nav className="flex items-center gap-1">
         <Link
           href={{ pathname: "/budgets", query: { month: shiftMonth(month, -1) } }}
-          className="text-ink underline underline-offset-2"
+          aria-label={t("months.previous")}
+          className={buttonVariants({ variant: "secondary", size: "icon" })}
         >
-          {t("months.previous")}
+          <ChevronLeft />
         </Link>
-        <span className="text-ink-muted">
+        <span className="flex h-control w-56 items-center justify-center text-14">
           {formatter.dateTime(monthRange(month).from, monthFormat)}
         </span>
         <Link
           href={{ pathname: "/budgets", query: { month: shiftMonth(month, 1) } }}
-          className="text-ink underline underline-offset-2"
+          aria-label={t("months.next")}
+          className={buttonVariants({ variant: "secondary", size: "icon" })}
         >
-          {t("months.next")}
+          <ChevronRight />
         </Link>
+        <span className="ml-2 flex w-28 justify-start">
+          {month === format(new Date(), "yyyy-MM") ? null : (
+            <Link
+              href="/budgets"
+              className={buttonVariants({ variant: "ghost" })}
+            >
+              {t("months.current")}
+            </Link>
+          )}
+        </span>
       </nav>
 
       {failed ? (
@@ -66,7 +82,7 @@ export default async function BudgetsPage({
         key={month}
         fallback={<Skeleton rows={4} columns={3} header={false} />}
       >
-        <BudgetsList locale={locale} month={month} />
+        <BudgetsList month={month} />
       </Suspense>
     </div>
   );

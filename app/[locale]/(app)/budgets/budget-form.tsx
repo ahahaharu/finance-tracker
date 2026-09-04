@@ -103,6 +103,7 @@ function BudgetForm({
         </Button>
         <Link
           href={{ pathname: "/budgets", query: { month } }}
+          scroll={false}
           className="flex h-control items-center px-3 text-13 text-ink-muted hover:text-ink"
         >
           {t("form.cancel")}
