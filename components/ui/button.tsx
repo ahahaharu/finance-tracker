@@ -12,6 +12,7 @@ const buttonVariants = cva(
         secondary: "border border-line-strong text-ink hover:bg-sunken",
         ghost: "text-ink hover:bg-sunken",
         destructive: "text-negative hover:bg-sunken",
+        destructiveSolid: "bg-negative font-medium text-bg hover:opacity-90",
       },
       size: {
         default: "h-control px-3",

@@ -2,7 +2,8 @@ import { format } from "date-fns";
 import { notFound } from "next/navigation";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { toLocale } from "@/i18n/routing";
 import { requireUser } from "@/lib/auth/guards";
 import { NotFoundError } from "@/lib/errors";
@@ -16,7 +17,7 @@ import {
 import { balanceOptions, listWallets } from "@/lib/services/wallet";
 import { cn } from "@/lib/utils";
 
-import { deleteTransactionAction, updateTransactionAction } from "../actions";
+import { updateTransactionAction } from "../actions";
 import { transactionFormErrorCodes } from "../failure";
 import { TransactionForm } from "../transaction-form";
 import { TransferDetails } from "../transfer-details";
@@ -50,7 +51,7 @@ export default async function TransactionPage({
     return (
       <TransferDetails
         groupId={transaction.transferGroupId}
-        locale={locale}
+        transactionId={transaction.id}
         userId={user.id}
         baseCurrency={user.baseCurrency}
       />
@@ -99,25 +100,12 @@ export default async function TransactionPage({
         </div>
       </dl>
 
-      <details className="group flex items-center gap-1">
-        <summary
-          className={cn(
-            buttonVariants({ variant: "ghost" }),
-            "w-fit cursor-default list-none [&::-webkit-details-marker]:hidden",
-          )}
-        >
-          <span className="group-open:hidden">{t("actions.delete")}</span>
-          <span className="hidden group-open:inline">
-            {t("actions.cancel")}
-          </span>
-        </summary>
-        <form action={deleteTransactionAction.bind(null, locale)}>
-          <input type="hidden" name="transactionId" value={transaction.id} />
-          <Button type="submit" variant="destructive">
-            {t("actions.confirmDelete")}
-          </Button>
-        </form>
-      </details>
+      <Link
+        href={`/transactions/${transaction.id}/delete`}
+        className={cn(buttonVariants({ variant: "destructive" }), "w-fit")}
+      >
+        {t("actions.delete")}
+      </Link>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import { format } from "date-fns";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getFormatter, getTranslations } from "next-intl/server";
 
 import { Amount } from "@/components/ui/amount";
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/table";
 import { Link } from "@/i18n/navigation";
 import { requireUser } from "@/lib/auth/guards";
+import { cn } from "@/lib/utils";
 import type { CollectionQuery } from "@/lib/schemas/collection";
 import type { TransactionFilterInput } from "@/lib/schemas/transaction";
 import {
@@ -84,7 +86,14 @@ async function TransactionsList({
               >
                 {t("filters.reset")}
               </Link>
-            ) : undefined
+            ) : (
+              <Link
+                href="/transactions/new/expense"
+                className={buttonVariants({ variant: "secondary" })}
+              >
+                {t("add")}
+              </Link>
+            )
           }
         />
       ) : (
@@ -182,16 +191,27 @@ async function TransactionsList({
       )}
 
       {totalPages > 1 ? (
-        <nav className="flex items-center gap-3 text-12 text-ink-muted">
+        <nav className="flex items-center gap-1">
           {page.page > 1 ? (
             <Link
               href={pageHref(filterQuery, page.page - 1)}
-              className="text-ink underline underline-offset-2"
+              aria-label={t("pagination.previous")}
+              className={buttonVariants({ variant: "secondary", size: "icon" })}
             >
-              {t("pagination.previous")}
+              <ChevronLeft />
             </Link>
-          ) : null}
-          <span>
+          ) : (
+            <span
+              aria-hidden="true"
+              className={cn(
+                buttonVariants({ variant: "secondary", size: "icon" }),
+                "text-ink-faint opacity-50",
+              )}
+            >
+              <ChevronLeft />
+            </span>
+          )}
+          <span className="px-2 text-12 text-ink-muted">
             {t("pagination.position", {
               page: page.page,
               totalPages,
@@ -200,11 +220,22 @@ async function TransactionsList({
           {page.page < totalPages ? (
             <Link
               href={pageHref(filterQuery, page.page + 1)}
-              className="text-ink underline underline-offset-2"
+              aria-label={t("pagination.next")}
+              className={buttonVariants({ variant: "secondary", size: "icon" })}
             >
-              {t("pagination.next")}
+              <ChevronRight />
             </Link>
-          ) : null}
+          ) : (
+            <span
+              aria-hidden="true"
+              className={cn(
+                buttonVariants({ variant: "secondary", size: "icon" }),
+                "text-ink-faint opacity-50",
+              )}
+            >
+              <ChevronRight />
+            </span>
+          )}
         </nav>
       ) : null}
     </>

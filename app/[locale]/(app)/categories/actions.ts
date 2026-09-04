@@ -125,20 +125,22 @@ export async function deleteCategoryAction(
 
   revalidatePath(`/${locale}/categories`);
 
+  if (!failure) {
+    return redirect({
+      href: { pathname: "/categories", query: kind ? { kind } : {} },
+      locale,
+    });
+  }
+
   return redirect({
     href: {
-      pathname: "/categories",
+      pathname: `/categories/${categoryId}/delete`,
       query: {
+        error: failure.code as string,
         ...(kind ? { kind } : {}),
-        ...(failure
-          ? {
-              error: failure.code as string,
-              categoryId,
-              ...(failure.transactionCount === undefined
-                ? {}
-                : { count: String(failure.transactionCount) }),
-            }
-          : {}),
+        ...(failure.transactionCount === undefined
+          ? {}
+          : { count: String(failure.transactionCount) }),
       },
     },
     locale,

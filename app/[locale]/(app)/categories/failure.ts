@@ -17,9 +17,8 @@ export type CategoryFormState = {
   transactionCount?: number;
 };
 
-export type Failure = {
+export type DeleteFailure = {
   code: CategoryFormErrorCode;
-  categoryId: string;
   count: number;
 };
 
@@ -38,13 +37,12 @@ export function readKind(query: SearchParams): CategoryKind | undefined {
   return kinds.find((kind) => kind === single(query.kind));
 }
 
-export function readFailure(query: SearchParams): Failure | null {
+export function readDeleteFailure(query: SearchParams): DeleteFailure | null {
   const code = deleteErrorCodes.find((known) => known === single(query.error));
-  const categoryId = single(query.categoryId);
 
-  if (!code || !categoryId) {
+  if (!code) {
     return null;
   }
 
-  return { code, categoryId, count: Number(single(query.count) ?? 0) };
+  return { code, count: Number(single(query.count) ?? 0) };
 }

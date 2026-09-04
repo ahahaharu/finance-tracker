@@ -1,7 +1,7 @@
-import type { Locale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 
 import { buttonVariants } from "@/components/ui/button";
+import { LinkPending } from "@/components/ui/link-pending";
 import { CategoryDot } from "@/components/ui/category-dot";
 import { EmptyState } from "@/components/ui/empty-state";
 import {
@@ -17,18 +17,7 @@ import { requireUser } from "@/lib/auth/guards";
 import type { CategoryKind } from "@/lib/generated/prisma/enums";
 import { listCategories } from "@/lib/services/category";
 
-import { DeleteCategory } from "./delete-category";
-import type { Failure } from "./failure";
-
-async function CategoriesList({
-  locale,
-  kind,
-  failure,
-}: {
-  locale: Locale;
-  kind?: CategoryKind;
-  failure: Failure | null;
-}) {
+async function CategoriesList({ kind }: { kind?: CategoryKind }) {
   const user = await requireUser();
   const [{ items }, t] = await Promise.all([
     listCategories(user.id, { kind }),
@@ -77,23 +66,18 @@ async function CategoriesList({
                 <TableCell className="text-ink-muted">
                   {t(`kinds.${category.kind}`)}
                 </TableCell>
-                <TableCell>
-                  <div className="flex flex-col items-end gap-1">
-                    <DeleteCategory
-                      categoryId={category.id}
-                      kind={kind}
-                      locale={locale}
-                    />
-                    {failure?.categoryId === category.id ? (
-                      <p className="text-12 text-negative">
-                        {failure.code === "CATEGORY_HAS_TRANSACTIONS"
-                          ? t("errors.CATEGORY_HAS_TRANSACTIONS", {
-                              count: failure.count,
-                            })
-                          : t(`errors.${failure.code}`)}
-                      </p>
-                    ) : null}
-                  </div>
+                <TableCell className="text-right">
+                  <Link
+                    href={
+                      kind
+                        ? `/categories/${category.id}/delete?kind=${kind}`
+                        : `/categories/${category.id}/delete`
+                    }
+                    className={buttonVariants({ variant: "destructive" })}
+                  >
+                    {t("actions.delete")}
+                    <LinkPending />
+                  </Link>
                 </TableCell>
               </TableRow>
             ))}

@@ -15,6 +15,11 @@
       "en": "English"
     }
   },
+  "dialog": {
+    "close": "Close",
+    "delete": "Delete",
+    "cancel": "Cancel"
+  },
   "auth": {
     "login": {
       "title": "Sign in",
@@ -176,8 +181,6 @@
     },
     "actions": {
       "delete": "Delete",
-      "confirmDelete": "Confirm",
-      "cancel": "Cancel",
       "retry": "Retry"
     },
     "errors": {
@@ -186,6 +189,10 @@
       "WALLET_HAS_TRANSACTIONS": "The wallet has {count} transactions. Delete them first",
       "NOT_FOUND": "Wallet not found",
       "unexpected": "Wallets could not be loaded"
+    },
+    "confirmDelete": {
+      "title": "Delete account",
+      "message": "Delete the account “{name}”? This cannot be undone."
     }
   },
   "categories": {
@@ -230,8 +237,6 @@
     },
     "actions": {
       "delete": "Delete",
-      "confirmDelete": "Confirm",
-      "cancel": "Cancel",
       "retry": "Retry"
     },
     "errors": {
@@ -240,17 +245,20 @@
       "CATEGORY_HAS_TRANSACTIONS": "The category has {count} transactions. Delete them first",
       "NOT_FOUND": "Category not found",
       "unexpected": "Categories could not be loaded"
+    },
+    "confirmDelete": {
+      "title": "Delete category",
+      "message": "Delete the category “{name}”? This cannot be undone."
     }
   },
   "transactions": {
     "title": "Transactions",
-    "addTransfer": "Transfer",
     "empty": "No transactions yet. The first one shows up here right after you add it.",
-    "needsWalletAndCategory": "Adding a transaction needs at least one wallet and one category.",
     "noNote": "No note",
     "types": {
       "INCOME": "Income",
-      "EXPENSE": "Expense"
+      "EXPENSE": "Expense",
+      "TRANSFER": "Transfer"
     },
     "filters": {
       "from": "From",
@@ -317,12 +325,11 @@
       "editTitle": "Transaction",
       "create": "Add",
       "save": "Save",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "createTitle": "New transaction"
     },
     "actions": {
       "delete": "Delete",
-      "confirmDelete": "Confirm",
-      "cancel": "Cancel",
       "retry": "Retry"
     },
     "errors": {
@@ -333,12 +340,18 @@
       "NOT_FOUND": "Transaction not found",
       "unexpected": "Transactions could not be loaded"
     },
-    "emptyFiltered": "No transactions match these filters."
+    "emptyFiltered": "No transactions match these filters.",
+    "add": "Add transaction",
+    "needsWallet": "Add at least one account before recording transactions.",
+    "needsCategory": "Add at least one category before recording transactions.",
+    "needsTwoWallets": "A transfer needs at least two accounts.",
+    "confirmDelete": {
+      "title": "Delete transaction",
+      "message": "Delete this transaction? This cannot be undone."
+    }
   },
   "transfers": {
-    "title": "New transfer",
     "detailsTitle": "Transfer",
-    "needsTwoWallets": "A transfer needs at least two wallets.",
     "editHint": "A transfer is not editable: delete it and create it anew.",
     "fields": {
       "from": "From wallet",
@@ -369,9 +382,7 @@
       "cancel": "Cancel"
     },
     "actions": {
-      "delete": "Delete transfer",
-      "confirmDelete": "Confirm",
-      "cancel": "Cancel"
+      "delete": "Delete transfer"
     },
     "errors": {
       "VALIDATION_FAILED": "Check the fields above",
@@ -379,6 +390,9 @@
       "FUTURE_DATE": "A transfer cannot be dated in the future",
       "RATE_NOT_AVAILABLE": "No rate for this date or earlier — load the rates first",
       "NOT_FOUND": "Transfer not found"
+    },
+    "confirmDelete": {
+      "message": "Delete this transfer? Both entries are removed and this cannot be undone."
     }
   },
   "budgets": {
@@ -388,7 +402,8 @@
     "needsCategory": "Create at least one expense category first.",
     "months": {
       "previous": "Previous",
-      "next": "Next"
+      "next": "Next",
+      "current": "This month"
     },
     "fields": {
       "category": "Category",
@@ -414,8 +429,6 @@
     },
     "actions": {
       "delete": "Delete",
-      "confirmDelete": "Confirm",
-      "cancel": "Cancel",
       "retry": "Retry"
     },
     "errors": {
@@ -427,7 +440,11 @@
     },
     "remaining": "Remaining",
     "over": "Over by",
-    "percent": "{percent}%"
+    "percent": "{percent}%",
+    "confirmDelete": {
+      "title": "Delete budget",
+      "message": "Delete the budget for “{name}”? This cannot be undone."
+    }
   },
   "budget": {
     "withinLimit": "on track",

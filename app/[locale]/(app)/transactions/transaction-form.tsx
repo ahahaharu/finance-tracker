@@ -12,7 +12,6 @@ import type { CategoryKind, Currency } from "@/lib/generated/prisma/enums";
 import type { EntryType } from "@/lib/schemas/transaction";
 import { toMoneyInput } from "@/lib/format/money";
 import { entryTypes } from "@/lib/schemas/transaction";
-import { cn } from "@/lib/utils";
 
 import type { TransactionFormState } from "./failure";
 
@@ -36,8 +35,8 @@ type TransactionFormProps = {
   wallets: readonly WalletOption[];
   categories: readonly CategoryOption[];
   transaction?: TransactionValues;
+  fixedType?: EntryType;
   now: string;
-  variant?: "row" | "column";
   initialState: TransactionFormState;
 };
 
@@ -46,12 +45,14 @@ function TransactionForm({
   wallets,
   categories,
   transaction,
+  fixedType,
   now,
-  variant = "column",
   initialState,
 }: TransactionFormProps) {
   const t = useTranslations("transactions");
-  const [type, setType] = useState<string>(transaction?.type ?? "EXPENSE");
+  const [type, setType] = useState<string>(
+    fixedType ?? transaction?.type ?? "EXPENSE",
+  );
   const [walletId, setWalletId] = useState<string>(
     transaction?.walletId ?? wallets[0]?.id ?? "",
   );
@@ -82,23 +83,21 @@ function TransactionForm({
   return (
     <form
       action={formAction}
-      className={cn(
-        "flex gap-3",
-        variant === "row"
-          ? "flex-wrap items-end"
-          : "w-full max-w-[320px] flex-col",
-      )}
+      className="flex w-full max-w-[320px] flex-col gap-3"
       noValidate
     >
       <FormFallback />
-      <Select
-        name="type"
-        value={type}
-        onValueChange={(value) => setType(value ?? "EXPENSE")}
-        options={typeOptions}
-        label={t("fields.type")}
-        className={variant === "row" ? "w-36" : undefined}
-      />
+      {fixedType ? (
+        <input type="hidden" name="type" value={fixedType} />
+      ) : (
+        <Select
+          name="type"
+          value={type}
+          onValueChange={(value) => setType(value ?? "EXPENSE")}
+          options={typeOptions}
+          label={t("fields.type")}
+        />
+      )}
 
       <Input
         name="amount"
@@ -108,7 +107,6 @@ function TransactionForm({
         }
         placeholder={t("placeholders.amount")}
         label={t("fields.amount")}
-        fieldClassName={variant === "row" ? "w-32" : undefined}
         error={
           state.invalid?.includes("amount") ? t("fieldErrors.amount") : undefined
         }
@@ -121,7 +119,6 @@ function TransactionForm({
         options={walletOptions}
         label={t("fields.wallet")}
         placeholder={t("placeholders.wallet")}
-        className={variant === "row" ? "w-44" : undefined}
         error={
           state.invalid?.includes("walletId")
             ? t("fieldErrors.wallet")
@@ -136,7 +133,6 @@ function TransactionForm({
         options={categoryOptions}
         label={t("fields.category")}
         placeholder={t("placeholders.category")}
-        className={variant === "row" ? "w-44" : undefined}
         error={
           state.code === "CATEGORY_KIND_MISMATCH"
             ? t("errors.CATEGORY_KIND_MISMATCH")
@@ -152,7 +148,6 @@ function TransactionForm({
         max={now}
         defaultValue={transaction?.occurredAt ?? now}
         label={t("fields.occurredAt")}
-        fieldClassName={variant === "row" ? "w-52" : undefined}
         error={
           state.code === "FUTURE_DATE"
             ? t("errors.FUTURE_DATE")
@@ -167,7 +162,6 @@ function TransactionForm({
         defaultValue={transaction?.note ?? ""}
         placeholder={t("placeholders.note")}
         label={t("fields.note")}
-        fieldClassName={variant === "row" ? "w-56" : undefined}
         error={
           state.invalid?.includes("note") ? t("fieldErrors.note") : undefined
         }
@@ -177,14 +171,13 @@ function TransactionForm({
         <Button type="submit" variant="primary" disabled={pending}>
           {transaction ? t("form.save") : t("form.create")}
         </Button>
-        {transaction ? (
-          <Link
-            href="/transactions"
-            className="flex h-control items-center px-3 text-13 text-ink-muted hover:text-ink"
-          >
-            {t("form.cancel")}
-          </Link>
-        ) : null}
+        <Link
+          href="/transactions"
+          scroll={false}
+          className="flex h-control items-center px-3 text-13 text-ink-muted hover:text-ink"
+        >
+          {t("form.cancel")}
+        </Link>
       </div>
 
       {state.code === "RATE_NOT_AVAILABLE" || state.code === "NOT_FOUND" ? (

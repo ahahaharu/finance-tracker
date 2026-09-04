@@ -133,6 +133,7 @@ function CategoryForm({
         </Button>
         <Link
           href="/categories"
+          scroll={false}
           className="flex h-control items-center px-3 text-13 text-ink-muted hover:text-ink"
         >
           {t("form.cancel")}

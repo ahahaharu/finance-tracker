@@ -1,9 +1,9 @@
-import type { Locale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 
 import { Amount } from "@/components/ui/amount";
 import { BudgetStatus } from "@/components/ui/budget-status";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { LinkPending } from "@/components/ui/link-pending";
 import { CategoryDot } from "@/components/ui/category-dot";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Link } from "@/i18n/navigation";
@@ -11,15 +11,7 @@ import { requireUser } from "@/lib/auth/guards";
 import { listBudgets } from "@/lib/services/budget";
 import { cn } from "@/lib/utils";
 
-import { deleteBudgetAction } from "./actions";
-
-async function BudgetsList({
-  locale,
-  month,
-}: {
-  locale: Locale;
-  month: string;
-}) {
+async function BudgetsList({ month }: { month: string }) {
   const user = await requireUser();
   const [budgets, t] = await Promise.all([
     listBudgets(user.id, month),
@@ -72,28 +64,16 @@ async function BudgetsList({
                     />
                   </span>
                   <BudgetStatus ratio={budget.usedPercent / 100} />
-                  <details className="group flex items-center gap-1">
-                    <summary
-                      className={cn(
-                        buttonVariants({ variant: "ghost" }),
-                        "cursor-default list-none [&::-webkit-details-marker]:hidden",
-                      )}
-                    >
-                      <span className="group-open:hidden">
-                        {t("actions.delete")}
-                      </span>
-                      <span className="hidden group-open:inline">
-                        {t("actions.cancel")}
-                      </span>
-                    </summary>
-                    <form action={deleteBudgetAction.bind(null, locale)}>
-                      <input type="hidden" name="budgetId" value={budget.id} />
-                      <input type="hidden" name="month" value={month} />
-                      <Button type="submit" variant="destructive">
-                        {t("actions.confirmDelete")}
-                      </Button>
-                    </form>
-                  </details>
+                  <Link
+                    href={{
+                      pathname: `/budgets/${budget.id}/delete`,
+                      query: { month },
+                    }}
+                    className={buttonVariants({ variant: "destructive" })}
+                  >
+                    {t("actions.delete")}
+                    <LinkPending />
+                  </Link>
                 </div>
               </div>
 

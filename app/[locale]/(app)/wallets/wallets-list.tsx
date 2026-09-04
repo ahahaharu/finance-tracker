@@ -1,8 +1,8 @@
 import { getTranslations } from "next-intl/server";
-import type { Locale } from "next-intl";
 
 import { Amount } from "@/components/ui/amount";
 import { buttonVariants } from "@/components/ui/button";
+import { LinkPending } from "@/components/ui/link-pending";
 import { EmptyState } from "@/components/ui/empty-state";
 import {
   Table,
@@ -17,16 +17,7 @@ import { Link } from "@/i18n/navigation";
 import { requireUser } from "@/lib/auth/guards";
 import { balanceOptions, listWallets } from "@/lib/services/wallet";
 
-import { DeleteWallet } from "./delete-wallet";
-import type { Failure } from "./failure";
-
-async function WalletsList({
-  locale,
-  failure,
-}: {
-  locale: Locale;
-  failure: Failure | null;
-}) {
+async function WalletsList() {
   const user = await requireUser();
   const [{ items, totalBalance }, t] = await Promise.all([
     listWallets(user.id, balanceOptions(user)),
@@ -92,19 +83,14 @@ async function WalletsList({
                     baseCurrency={wallet.baseCurrency}
                   />
                 </TableCell>
-                <TableCell>
-                  <div className="flex flex-col items-end gap-1">
-                    <DeleteWallet walletId={wallet.id} locale={locale} />
-                    {failure?.walletId === wallet.id ? (
-                      <p className="text-12 text-negative">
-                        {failure.code === "WALLET_HAS_TRANSACTIONS"
-                          ? t("errors.WALLET_HAS_TRANSACTIONS", {
-                              count: failure.count,
-                            })
-                          : t(`errors.${failure.code}`)}
-                      </p>
-                    ) : null}
-                  </div>
+                <TableCell className="text-right">
+                  <Link
+                    href={`/wallets/${wallet.id}/delete`}
+                    className={buttonVariants({ variant: "destructive" })}
+                  >
+                    {t("actions.delete")}
+                    <LinkPending />
+                  </Link>
                 </TableCell>
               </TableRow>
             ))}

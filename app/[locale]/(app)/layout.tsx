@@ -18,6 +18,7 @@ function initial(name: string): string {
 
 export default async function AppLayout({
   children,
+  modal,
   params,
 }: LayoutProps<"/[locale]">) {
   const locale = toLocale((await params).locale);
@@ -73,6 +74,7 @@ export default async function AppLayout({
       </aside>
 
       <main className="min-w-0 flex-1 px-page py-page">{children}</main>
+      {modal}
     </div>
   );
 }

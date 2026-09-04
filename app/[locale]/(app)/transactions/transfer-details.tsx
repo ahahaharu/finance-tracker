@@ -1,14 +1,12 @@
-import type { Locale } from "next-intl";
 import { getFormatter, getTranslations } from "next-intl/server";
 
 import { Amount } from "@/components/ui/amount";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import type { Currency } from "@/lib/generated/prisma/enums";
 import { transactionContext } from "@/lib/services/transaction";
 import { getTransfer } from "@/lib/services/transfer";
 import { cn } from "@/lib/utils";
-
-import { deleteTransferAction } from "./transfer/actions";
 
 const momentFormat = {
   day: "numeric",
@@ -20,12 +18,12 @@ const momentFormat = {
 
 async function TransferDetails({
   groupId,
-  locale,
+  transactionId,
   userId,
   baseCurrency,
 }: {
   groupId: string;
-  locale: Locale;
+  transactionId: string;
   userId: string;
   baseCurrency: Currency;
 }) {
@@ -90,25 +88,12 @@ async function TransferDetails({
 
       <p className="text-12 text-ink-muted">{t("editHint")}</p>
 
-      <details className="group flex items-center gap-1">
-        <summary
-          className={cn(
-            buttonVariants({ variant: "ghost" }),
-            "w-fit cursor-default list-none [&::-webkit-details-marker]:hidden",
-          )}
-        >
-          <span className="group-open:hidden">{t("actions.delete")}</span>
-          <span className="hidden group-open:inline">
-            {t("actions.cancel")}
-          </span>
-        </summary>
-        <form action={deleteTransferAction.bind(null, locale)}>
-          <input type="hidden" name="groupId" value={transfer.groupId} />
-          <Button type="submit" variant="destructive">
-            {t("actions.confirmDelete")}
-          </Button>
-        </form>
-      </details>
+      <Link
+        href={`/transactions/${transactionId}/delete`}
+        className={cn(buttonVariants({ variant: "destructive" }), "w-fit")}
+      >
+        {t("actions.delete")}
+      </Link>
     </div>
   );
 }

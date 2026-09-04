@@ -3,27 +3,43 @@ import { getTranslations } from "next-intl/server";
 import { buttonVariants } from "@/components/ui/button";
 import { controlClassName } from "@/components/ui/input";
 import { Link } from "@/i18n/navigation";
+import { requireUser } from "@/lib/auth/guards";
 import { filterTypes, type TransactionFilterInput } from "@/lib/schemas/transaction";
+import { listCategories } from "@/lib/services/category";
+import { balanceOptions, listWallets } from "@/lib/services/wallet";
 import { cn } from "@/lib/utils";
 
-type Option = { id: string; name: string };
-
 const labelClassName = "flex flex-col gap-1.5 text-12 text-ink-muted";
+const fieldWidths = ["w-40", "w-40", "w-44", "w-44", "w-36", "w-48", "w-44"];
+
+function FilterBarFallback() {
+  return (
+    <div className="flex flex-wrap items-end gap-3 border-b border-line pb-4">
+      {fieldWidths.map((width) => (
+        <div key={width} className="flex flex-col gap-1.5">
+          <span className="h-3 w-16 rounded-[var(--radius)] bg-sunken" />
+          <span
+            className={cn("h-control rounded-[var(--radius)] bg-sunken", width)}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 async function FilterBar({
   filter,
-  wallets,
-  categories,
   action,
-  exportHref,
 }: {
   filter: TransactionFilterInput;
-  wallets: readonly Option[];
-  categories: readonly Option[];
   action: string;
-  exportHref: string;
 }) {
-  const t = await getTranslations("transactions");
+  const user = await requireUser();
+  const [wallets, categories, t] = await Promise.all([
+    listWallets(user.id, balanceOptions(user)),
+    listCategories(user.id),
+    getTranslations("transactions"),
+  ]);
 
   return (
     <form
@@ -59,7 +75,7 @@ async function FilterBar({
           className={cn(controlClassName, "w-44")}
         >
           <option value="">{t("filters.any")}</option>
-          {wallets.map((wallet) => (
+          {wallets.items.map((wallet) => (
             <option key={wallet.id} value={wallet.id}>
               {wallet.name}
             </option>
@@ -75,7 +91,7 @@ async function FilterBar({
           className={cn(controlClassName, "w-44")}
         >
           <option value="">{t("filters.any")}</option>
-          {categories.map((category) => (
+          {categories.items.map((category) => (
             <option key={category.id} value={category.id}>
               {category.name}
             </option>
@@ -129,12 +145,8 @@ async function FilterBar({
       <Link href="/transactions" className={buttonVariants({ variant: "ghost" })}>
         {t("filters.reset")}
       </Link>
-
-      <a href={exportHref} className={buttonVariants({ variant: "ghost" })}>
-        {t("filters.export")}
-      </a>
     </form>
   );
 }
 
-export { FilterBar };
+export { FilterBar, FilterBarFallback };

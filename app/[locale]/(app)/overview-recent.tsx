@@ -51,7 +51,7 @@ async function OverviewRecent() {
           message={t("empty.transactions")}
           action={
             <Link
-              href="/transactions"
+              href="/transactions/new/expense"
               className={buttonVariants({ variant: "secondary" })}
             >
               {t("actions.addTransaction")}

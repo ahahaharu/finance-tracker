@@ -155,10 +155,9 @@ export async function deleteWalletAction(
 
   return redirect({
     href: {
-      pathname: "/wallets",
+      pathname: `/wallets/${walletId}/delete`,
       query: {
         error: failure.code as string,
-        walletId,
         ...(failure.transactionCount === undefined
           ? {}
           : { count: String(failure.transactionCount) }),
