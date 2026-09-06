@@ -1,15 +1,8 @@
-import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { toLocale } from "@/i18n/routing";
-import { requireUser } from "@/lib/auth/guards";
-import { NotFoundError } from "@/lib/errors";
-import { decodeFailure } from "@/lib/forms/state";
-import { type CategoryView, getCategory } from "@/lib/services/category";
 
-import { updateCategoryAction } from "../actions";
-import { categoryFormErrorCodes } from "../failure";
-import { CategoryForm } from "../category-form";
+import { EditCategory } from "./edit-category";
 
 export default async function CategoryPage({
   params,
@@ -20,30 +13,12 @@ export default async function CategoryPage({
 
   setRequestLocale(locale);
 
-  const user = await requireUser();
-
-  let category: CategoryView;
-
-  try {
-    category = await getCategory(user.id, id);
-  } catch (error) {
-    if (error instanceof NotFoundError) {
-      notFound();
-    }
-
-    throw error;
-  }
-
   const t = await getTranslations("categories");
 
   return (
     <div className="flex flex-col gap-section">
       <h1 className="text-20 font-medium">{t("form.editTitle")}</h1>
-      <CategoryForm
-        action={updateCategoryAction.bind(null, locale, category.id)}
-        category={category}
-        initialState={decodeFailure(await searchParams, categoryFormErrorCodes)}
-      />
+      <EditCategory locale={locale} categoryId={id} query={await searchParams} />
     </div>
   );
 }

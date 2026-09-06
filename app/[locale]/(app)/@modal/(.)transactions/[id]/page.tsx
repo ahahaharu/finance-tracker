@@ -1,10 +1,14 @@
 import { setRequestLocale } from "next-intl/server";
 
+import { RouteDialog } from "@/components/ui/dialog";
 import { toLocale } from "@/i18n/routing";
 
-import { EditTransaction, transactionTitle } from "./edit-transaction";
+import {
+  EditTransaction,
+  transactionTitle,
+} from "../../../transactions/[id]/edit-transaction";
 
-export default async function TransactionPage({
+export default async function EditTransactionModal({
   params,
   searchParams,
 }: PageProps<"/[locale]/transactions/[id]">) {
@@ -14,13 +18,12 @@ export default async function TransactionPage({
   setRequestLocale(locale);
 
   return (
-    <div className="flex flex-col gap-section">
-      <h1 className="text-20 font-medium">{await transactionTitle(id)}</h1>
+    <RouteDialog title={await transactionTitle(id)} closeHref="/transactions">
       <EditTransaction
         locale={locale}
         transactionId={id}
         query={await searchParams}
       />
-    </div>
+    </RouteDialog>
   );
 }
