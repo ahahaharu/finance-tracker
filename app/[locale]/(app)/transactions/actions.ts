@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { RedirectType } from "next/navigation";
 import type { Locale } from "next-intl";
 import type { ZodError } from "zod";
 
@@ -9,6 +10,7 @@ import { requireUser } from "@/lib/auth/guards";
 import { type ErrorCode, isDomainError } from "@/lib/errors";
 import { parseMoney } from "@/lib/format/money";
 import { formFailure } from "@/lib/forms/failure";
+import { isDialogSubmit } from "@/lib/forms/state";
 import {
   createTransactionSchema,
   updateTransactionSchema,
@@ -99,6 +101,10 @@ export async function createTransactionAction(
 
   revalidatePath(`/${locale}/transactions`);
 
+  if (isDialogSubmit(formData)) {
+    return { done: true };
+  }
+
   return redirect({ href: "/transactions", locale });
 }
 
@@ -140,6 +146,10 @@ export async function updateTransactionAction(
 
   revalidatePath(`/${locale}/transactions`);
 
+  if (isDialogSubmit(formData)) {
+    return { done: true };
+  }
+
   return redirect({ href: "/transactions", locale });
 }
 
@@ -160,11 +170,14 @@ export async function deleteTransactionAction(
 
   revalidatePath(`/${locale}/transactions`);
 
-  return redirect({
-    href: {
-      pathname: "/transactions",
-      query: failure ? { error: failure.code as string, transactionId } : {},
+  return redirect(
+    {
+      href: {
+        pathname: "/transactions",
+        query: failure ? { error: failure.code as string, transactionId } : {},
+      },
+      locale,
     },
-    locale,
-  });
+    RedirectType.replace,
+  );
 }

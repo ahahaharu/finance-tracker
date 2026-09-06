@@ -1,4 +1,4 @@
-import type { SearchParams } from "@/lib/forms/state";
+import type { FormState, SearchParams } from "@/lib/forms/state";
 
 export const walletFormErrorCodes = [
   "VALIDATION_FAILED",
@@ -9,9 +9,7 @@ export const walletFormErrorCodes = [
 
 export type WalletFormErrorCode = (typeof walletFormErrorCodes)[number];
 
-export type WalletFormState = {
-  code?: WalletFormErrorCode;
-  invalid?: string[];
+export type WalletFormState = FormState<WalletFormErrorCode> & {
   transactionCount?: number;
 };
 

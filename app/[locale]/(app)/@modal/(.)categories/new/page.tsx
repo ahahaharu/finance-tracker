@@ -25,7 +25,7 @@ export default async function NewCategoryModal({
   const t = await getTranslations("categories");
 
   return (
-    <RouteDialog title={t("form.createTitle")} closeHref="/categories">
+    <RouteDialog title={t("form.createTitle")}>
       <CategoryForm
         action={createCategoryAction.bind(null, locale)}
         defaultKind={defaultKind}

@@ -1,3 +1,5 @@
+import type { FormState } from "@/lib/forms/state";
+
 export const budgetFormErrorCodes = [
   "VALIDATION_FAILED",
   "BUDGET_EXISTS",
@@ -7,7 +9,4 @@ export const budgetFormErrorCodes = [
 
 export type BudgetFormErrorCode = (typeof budgetFormErrorCodes)[number];
 
-export type BudgetFormState = {
-  code?: BudgetFormErrorCode;
-  invalid?: string[];
-};
+export type BudgetFormState = FormState<BudgetFormErrorCode>;

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { RedirectType } from "next/navigation";
 import type { Locale } from "next-intl";
 import type { ZodError } from "zod";
 
@@ -9,6 +10,7 @@ import { requireUser } from "@/lib/auth/guards";
 import { type ErrorCode, isDomainError } from "@/lib/errors";
 import { parseMoney } from "@/lib/format/money";
 import { formFailure } from "@/lib/forms/failure";
+import { isDialogSubmit } from "@/lib/forms/state";
 import { createWalletSchema, updateWalletSchema } from "@/lib/schemas/wallet";
 import {
   balanceOptions,
@@ -89,6 +91,10 @@ export async function createWalletAction(
 
   revalidatePath(`/${locale}/wallets`);
 
+  if (isDialogSubmit(formData)) {
+    return { done: true };
+  }
+
   return redirect({ href: "/wallets", locale });
 }
 
@@ -129,6 +135,10 @@ export async function updateWalletAction(
 
   revalidatePath(`/${locale}/wallets`);
 
+  if (isDialogSubmit(formData)) {
+    return { done: true };
+  }
+
   return redirect({ href: "/wallets", locale });
 }
 
@@ -150,19 +160,22 @@ export async function deleteWalletAction(
   revalidatePath(`/${locale}/wallets`);
 
   if (!failure) {
-    return redirect({ href: "/wallets", locale });
+    return redirect({ href: "/wallets", locale }, RedirectType.replace);
   }
 
-  return redirect({
-    href: {
-      pathname: `/wallets/${walletId}/delete`,
-      query: {
-        error: failure.code as string,
-        ...(failure.transactionCount === undefined
-          ? {}
-          : { count: String(failure.transactionCount) }),
+  return redirect(
+    {
+      href: {
+        pathname: `/wallets/${walletId}/delete`,
+        query: {
+          error: failure.code as string,
+          ...(failure.transactionCount === undefined
+            ? {}
+            : { count: String(failure.transactionCount) }),
+        },
       },
+      locale,
     },
-    locale,
-  });
+    RedirectType.replace,
+  );
 }

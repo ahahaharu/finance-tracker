@@ -17,7 +17,7 @@ export default async function EditCategoryModal({
   const t = await getTranslations("categories");
 
   return (
-    <RouteDialog title={t("form.editTitle")} closeHref="/categories">
+    <RouteDialog title={t("form.editTitle")}>
       <EditCategory
         locale={locale}
         categoryId={id}

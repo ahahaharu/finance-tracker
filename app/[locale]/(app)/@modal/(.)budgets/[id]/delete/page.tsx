@@ -4,7 +4,6 @@ import { RouteDialog } from "@/components/ui/dialog";
 import { toLocale } from "@/i18n/routing";
 
 import { DeleteBudget } from "../../../../budgets/[id]/delete/delete-budget";
-import { readMonth } from "../../../../month";
 
 export default async function DeleteBudgetModal({
   params,
@@ -19,10 +18,7 @@ export default async function DeleteBudgetModal({
   const query = await searchParams;
 
   return (
-    <RouteDialog
-      title={t("confirmDelete.title")}
-      closeHref={`/budgets?month=${readMonth(query)}`}
-    >
+    <RouteDialog title={t("confirmDelete.title")}>
       <DeleteBudget locale={locale} budgetId={id} query={query} />
     </RouteDialog>
   );

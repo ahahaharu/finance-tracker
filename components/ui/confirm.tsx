@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
 
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Link } from "@/i18n/navigation";
+import { DialogCancel } from "@/components/ui/dialog";
 
 type ConfirmProps = {
   message: string;
@@ -30,13 +30,12 @@ async function Confirm({
         <Button type="submit" variant="destructiveSolid">
           {t("delete")}
         </Button>
-        <Link
+        <DialogCancel
           href={cancelHref}
-          scroll={false}
           className={buttonVariants({ variant: "ghost" })}
         >
           {t("cancel")}
-        </Link>
+        </DialogCancel>
       </div>
     </form>
   );

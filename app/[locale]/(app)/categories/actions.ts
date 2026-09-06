@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { RedirectType } from "next/navigation";
 import type { Locale } from "next-intl";
 import type { ZodError } from "zod";
 
@@ -8,6 +9,7 @@ import { redirect } from "@/i18n/navigation";
 import { requireUser } from "@/lib/auth/guards";
 import { type ErrorCode, isDomainError } from "@/lib/errors";
 import { formFailure } from "@/lib/forms/failure";
+import { isDialogSubmit } from "@/lib/forms/state";
 import {
   createCategorySchema,
   updateCategorySchema,
@@ -74,6 +76,10 @@ export async function createCategoryAction(
 
   revalidatePath(`/${locale}/categories`);
 
+  if (isDialogSubmit(formData)) {
+    return { done: true };
+  }
+
   return redirect({ href: "/categories", locale });
 }
 
@@ -104,6 +110,10 @@ export async function updateCategoryAction(
 
   revalidatePath(`/${locale}/categories`);
 
+  if (isDialogSubmit(formData)) {
+    return { done: true };
+  }
+
   return redirect({ href: "/categories", locale });
 }
 
@@ -126,23 +136,29 @@ export async function deleteCategoryAction(
   revalidatePath(`/${locale}/categories`);
 
   if (!failure) {
-    return redirect({
-      href: { pathname: "/categories", query: kind ? { kind } : {} },
-      locale,
-    });
+    return redirect(
+      {
+        href: { pathname: "/categories", query: kind ? { kind } : {} },
+        locale,
+      },
+      RedirectType.replace,
+    );
   }
 
-  return redirect({
-    href: {
-      pathname: `/categories/${categoryId}/delete`,
-      query: {
-        error: failure.code as string,
-        ...(kind ? { kind } : {}),
-        ...(failure.transactionCount === undefined
-          ? {}
-          : { count: String(failure.transactionCount) }),
+  return redirect(
+    {
+      href: {
+        pathname: `/categories/${categoryId}/delete`,
+        query: {
+          error: failure.code as string,
+          ...(kind ? { kind } : {}),
+          ...(failure.transactionCount === undefined
+            ? {}
+            : { count: String(failure.transactionCount) }),
+        },
       },
+      locale,
     },
-    locale,
-  });
+    RedirectType.replace,
+  );
 }

@@ -1,30 +1,87 @@
 "use client";
 
-import type { ReactNode } from "react";
+import {
+  type ComponentProps,
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { useRouter } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
+
+const DialogCloseContext = createContext<(() => void) | null>(null);
+
+function useDialogClose(): (() => void) | null {
+  return useContext(DialogCloseContext);
+}
+
+function useCloseWhenDone(done: boolean | undefined) {
+  const close = useDialogClose();
+  const router = useRouter();
+  const closed = useRef(false);
+
+  useEffect(() => {
+    if (!done || !close || closed.current) {
+      return;
+    }
+
+    closed.current = true;
+    close();
+    router.refresh();
+  }, [close, done, router]);
+}
+
+function DialogCancel({
+  href,
+  className,
+  children,
+}: {
+  href: ComponentProps<typeof Link>["href"];
+  className?: string;
+  children: ReactNode;
+}) {
+  const close = useDialogClose();
+
+  if (close) {
+    return (
+      <button type="button" onClick={close} className={className}>
+        {children}
+      </button>
+    );
+  }
+
+  return (
+    <Link href={href} scroll={false} className={className}>
+      {children}
+    </Link>
+  );
+}
 
 function RouteDialog({
   title,
-  closeHref,
   children,
 }: {
   title: string;
-  closeHref: string;
   children: ReactNode;
 }) {
   const t = useTranslations("dialog");
   const router = useRouter();
+  const close = useCallback(() => {
+    router.back();
+  }, [router]);
 
   return (
     <DialogPrimitive.Root
       open
       onOpenChange={(open) => {
         if (!open) {
-          router.push(closeHref, { scroll: false });
+          close();
         }
       }}
     >
@@ -42,11 +99,11 @@ function RouteDialog({
               <X size={16} />
             </DialogPrimitive.Close>
           </div>
-          {children}
+          <DialogCloseContext value={close}>{children}</DialogCloseContext>
         </DialogPrimitive.Popup>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
   );
 }
 
-export { RouteDialog };
+export { DialogCancel, RouteDialog, useCloseWhenDone, useDialogClose };

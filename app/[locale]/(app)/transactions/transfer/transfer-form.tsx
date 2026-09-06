@@ -4,10 +4,10 @@ import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
+import { DialogCancel, useCloseWhenDone } from "@/components/ui/dialog";
 import { FormFallback } from "@/components/form-fallback";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { Link } from "@/i18n/navigation";
 import type { Currency } from "@/lib/generated/prisma/enums";
 
 import type { TransferFormState } from "./failure";
@@ -36,6 +36,8 @@ function TransferForm({
   );
   const [toWalletId, setToWalletId] = useState<string>(wallets[1]?.id ?? "");
   const [state, formAction, pending] = useActionState(action, initialState);
+
+  useCloseWhenDone(state.done);
 
   const options = wallets.map((wallet) => ({
     value: wallet.id,
@@ -148,13 +150,12 @@ function TransferForm({
         <Button type="submit" variant="primary" disabled={pending}>
           {t("form.create")}
         </Button>
-        <Link
+        <DialogCancel
           href="/transactions"
-          scroll={false}
           className="flex h-control items-center px-3 text-13 text-ink-muted hover:text-ink"
         >
           {t("form.cancel")}
-        </Link>
+        </DialogCancel>
       </div>
 
       {state.code === "RATE_NOT_AVAILABLE" || state.code === "NOT_FOUND" ? (

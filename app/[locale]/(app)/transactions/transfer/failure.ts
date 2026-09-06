@@ -1,3 +1,5 @@
+import type { FormState } from "@/lib/forms/state";
+
 export const transferFormErrorCodes = [
   "VALIDATION_FAILED",
   "SAME_WALLET_TRANSFER",
@@ -8,7 +10,4 @@ export const transferFormErrorCodes = [
 
 export type TransferFormErrorCode = (typeof transferFormErrorCodes)[number];
 
-export type TransferFormState = {
-  code?: TransferFormErrorCode;
-  invalid?: string[];
-};
+export type TransferFormState = FormState<TransferFormErrorCode>;
