@@ -38,9 +38,7 @@ async function TransferDetails({
   ]);
 
   return (
-    <div className="flex flex-col gap-section">
-      <h1 className="text-20 font-medium">{t("detailsTitle")}</h1>
-
+    <div className="flex flex-col gap-4">
       <dl className="flex flex-col gap-2">
         <div className="flex items-baseline gap-3">
           <dt className="w-40 text-12 text-ink-muted">{t("fields.from")}</dt>

@@ -1,10 +1,11 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { RouteDialog } from "@/components/ui/dialog";
 import { toLocale } from "@/i18n/routing";
 
-import { EditWallet } from "./edit-wallet";
+import { EditWallet } from "../../../wallets/[id]/edit-wallet";
 
-export default async function WalletPage({
+export default async function EditWalletModal({
   params,
   searchParams,
 }: PageProps<"/[locale]/wallets/[id]">) {
@@ -16,9 +17,8 @@ export default async function WalletPage({
   const t = await getTranslations("wallets");
 
   return (
-    <div className="flex flex-col gap-section">
-      <h1 className="text-20 font-medium">{t("form.editTitle")}</h1>
+    <RouteDialog title={t("form.editTitle")} closeHref="/wallets">
       <EditWallet locale={locale} walletId={id} query={await searchParams} />
-    </div>
+    </RouteDialog>
   );
 }
