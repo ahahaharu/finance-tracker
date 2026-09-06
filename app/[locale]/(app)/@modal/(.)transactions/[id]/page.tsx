@@ -18,7 +18,7 @@ export default async function EditTransactionModal({
   setRequestLocale(locale);
 
   return (
-    <RouteDialog title={await transactionTitle(id)} closeHref="/transactions">
+    <RouteDialog title={await transactionTitle(id)}>
       <EditTransaction
         locale={locale}
         transactionId={id}

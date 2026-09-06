@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { RedirectType } from "next/navigation";
 import type { Locale } from "next-intl";
 import type { ZodError } from "zod";
 
@@ -9,6 +10,7 @@ import { requireUser } from "@/lib/auth/guards";
 import { type ErrorCode, isDomainError } from "@/lib/errors";
 import { parseMoney } from "@/lib/format/money";
 import { formFailure } from "@/lib/forms/failure";
+import { isDialogSubmit } from "@/lib/forms/state";
 import { createBudgetSchema, updateBudgetSchema } from "@/lib/schemas/budget";
 import {
   createBudget,
@@ -77,6 +79,10 @@ export async function createBudgetAction(
 
   revalidatePath(`/${locale}/budgets`);
 
+  if (isDialogSubmit(formData)) {
+    return { done: true };
+  }
+
   return redirect({
     href: { pathname: "/budgets", query: { month: input.data.month } },
     locale,
@@ -117,6 +123,10 @@ export async function updateBudgetAction(
 
   revalidatePath(`/${locale}/budgets`);
 
+  if (isDialogSubmit(formData)) {
+    return { done: true };
+  }
+
   return redirect({
     href: { pathname: "/budgets", query: { month } },
     locale,
@@ -141,14 +151,17 @@ export async function deleteBudgetAction(
 
   revalidatePath(`/${locale}/budgets`);
 
-  return redirect({
-    href: {
-      pathname: "/budgets",
-      query: {
-        ...(month ? { month } : {}),
-        ...(failure ? { error: failure.code as string, budgetId } : {}),
+  return redirect(
+    {
+      href: {
+        pathname: "/budgets",
+        query: {
+          ...(month ? { month } : {}),
+          ...(failure ? { error: failure.code as string, budgetId } : {}),
+        },
       },
+      locale,
     },
-    locale,
-  });
+    RedirectType.replace,
+  );
 }

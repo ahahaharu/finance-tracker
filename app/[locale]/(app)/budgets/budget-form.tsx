@@ -4,10 +4,10 @@ import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
+import { DialogCancel, useCloseWhenDone } from "@/components/ui/dialog";
 import { FormFallback } from "@/components/form-fallback";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { Link } from "@/i18n/navigation";
 import { toMoneyInput } from "@/lib/format/money";
 
 import type { BudgetFormState } from "./failure";
@@ -43,6 +43,8 @@ function BudgetForm({
     budget?.categoryId ?? categories[0]?.id ?? "",
   );
   const [state, formAction, pending] = useActionState(action, initialState);
+
+  useCloseWhenDone(state.done);
 
   const options = categories.map((category) => ({
     value: category.id,
@@ -101,13 +103,12 @@ function BudgetForm({
         <Button type="submit" variant="primary" disabled={pending}>
           {budget ? t("form.save") : t("form.create")}
         </Button>
-        <Link
+        <DialogCancel
           href={{ pathname: "/budgets", query: { month } }}
-          scroll={false}
           className="flex h-control items-center px-3 text-13 text-ink-muted hover:text-ink"
         >
           {t("form.cancel")}
-        </Link>
+        </DialogCancel>
       </div>
 
       {state.code === "NOT_FOUND" ? (

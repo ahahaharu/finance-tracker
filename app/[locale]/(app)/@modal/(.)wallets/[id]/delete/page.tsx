@@ -17,7 +17,7 @@ export default async function DeleteWalletModal({
   const t = await getTranslations("wallets");
 
   return (
-    <RouteDialog title={t("confirmDelete.title")} closeHref="/wallets">
+    <RouteDialog title={t("confirmDelete.title")}>
       <DeleteWallet locale={locale} walletId={id} query={await searchParams} />
     </RouteDialog>
   );

@@ -4,10 +4,10 @@ import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
+import { DialogCancel, useCloseWhenDone } from "@/components/ui/dialog";
 import { FormFallback } from "@/components/form-fallback";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { Link } from "@/i18n/navigation";
 import { toMoneyInput } from "@/lib/format/money";
 import { Currency, WalletType } from "@/lib/generated/prisma/enums";
 
@@ -36,6 +36,8 @@ function WalletForm({ action, wallet, initialState }: WalletFormProps) {
     wallet?.currency ?? Currency.BYN,
   );
   const [state, formAction, pending] = useActionState(action, initialState);
+
+  useCloseWhenDone(state.done);
 
   const typeOptions = Object.values(WalletType).map((value) => ({
     value,
@@ -117,13 +119,12 @@ function WalletForm({ action, wallet, initialState }: WalletFormProps) {
         <Button type="submit" variant="primary" disabled={pending}>
           {wallet ? t("form.save") : t("form.create")}
         </Button>
-        <Link
+        <DialogCancel
           href="/wallets"
-          scroll={false}
           className="flex h-control items-center px-3 text-13 text-ink-muted hover:text-ink"
         >
           {t("form.cancel")}
-        </Link>
+        </DialogCancel>
       </div>
 
       {state.code === "NOT_FOUND" ? (

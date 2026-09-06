@@ -16,10 +16,7 @@ export default async function DeleteTransactionModal({
   const t = await getTranslations("transactions");
 
   return (
-    <RouteDialog
-      title={t("confirmDelete.title")}
-      closeHref={`/transactions/${id}`}
-    >
+    <RouteDialog title={t("confirmDelete.title")}>
       <DeleteTransaction locale={locale} transactionId={id} />
     </RouteDialog>
   );

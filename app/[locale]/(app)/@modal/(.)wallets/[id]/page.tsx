@@ -17,7 +17,7 @@ export default async function EditWalletModal({
   const t = await getTranslations("wallets");
 
   return (
-    <RouteDialog title={t("form.editTitle")} closeHref="/wallets">
+    <RouteDialog title={t("form.editTitle")}>
       <EditWallet locale={locale} walletId={id} query={await searchParams} />
     </RouteDialog>
   );

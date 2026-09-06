@@ -5,10 +5,10 @@ import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { CategoryDot } from "@/components/ui/category-dot";
+import { DialogCancel, useCloseWhenDone } from "@/components/ui/dialog";
 import { FormFallback } from "@/components/form-fallback";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { Link } from "@/i18n/navigation";
 import { CategoryKind } from "@/lib/generated/prisma/enums";
 import { categoryColors } from "@/lib/schemas/category";
 import { cn } from "@/lib/utils";
@@ -45,6 +45,8 @@ function CategoryForm({
     category?.color ?? categoryColors[0],
   );
   const [state, formAction, pending] = useActionState(action, initialState);
+
+  useCloseWhenDone(state.done);
 
   const kindOptions = Object.values(CategoryKind).map((value) => ({
     value,
@@ -131,13 +133,12 @@ function CategoryForm({
         <Button type="submit" variant="primary" disabled={pending}>
           {category ? t("form.save") : t("form.create")}
         </Button>
-        <Link
+        <DialogCancel
           href="/categories"
-          scroll={false}
           className="flex h-control items-center px-3 text-13 text-ink-muted hover:text-ink"
         >
           {t("form.cancel")}
-        </Link>
+        </DialogCancel>
       </div>
 
       {state.code === "NOT_FOUND" ? (

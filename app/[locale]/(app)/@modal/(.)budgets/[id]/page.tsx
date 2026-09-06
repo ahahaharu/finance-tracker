@@ -3,7 +3,6 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { RouteDialog } from "@/components/ui/dialog";
 import { toLocale } from "@/i18n/routing";
 
-import { readMonth } from "../../../month";
 import { EditBudget } from "../../../budgets/[id]/edit-budget";
 
 export default async function EditBudgetModal({
@@ -19,10 +18,7 @@ export default async function EditBudgetModal({
   const query = await searchParams;
 
   return (
-    <RouteDialog
-      title={t("form.editTitle")}
-      closeHref={`/budgets?month=${readMonth(query)}`}
-    >
+    <RouteDialog title={t("form.editTitle")}>
       <EditBudget locale={locale} budgetId={id} query={query} />
     </RouteDialog>
   );

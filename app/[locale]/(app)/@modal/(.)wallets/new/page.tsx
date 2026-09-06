@@ -19,7 +19,7 @@ export default async function NewWalletModal({
   const t = await getTranslations("wallets");
 
   return (
-    <RouteDialog title={t("form.createTitle")} closeHref="/wallets">
+    <RouteDialog title={t("form.createTitle")}>
       <WalletForm
         action={createWalletAction.bind(null, locale)}
         initialState={decodeFailure(await searchParams, walletFormErrorCodes)}

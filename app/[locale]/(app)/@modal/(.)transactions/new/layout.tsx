@@ -18,7 +18,7 @@ export default async function NewEntryModalLayout({
   const t = await getTranslations("transactions");
 
   return (
-    <RouteDialog title={t("form.createTitle")} closeHref="/transactions">
+    <RouteDialog title={t("form.createTitle")}>
       {children}
     </RouteDialog>
   );

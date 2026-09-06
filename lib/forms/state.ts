@@ -1,6 +1,7 @@
 export const scriptField = "script";
 export const returnField = "returnTo";
 export const scopeField = "formScope";
+export const dialogField = "dialog";
 
 export type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -9,12 +10,20 @@ export type FormFailure<Code extends string> = {
   invalid?: string[];
 };
 
+export type FormState<Code extends string> = FormFailure<Code> & {
+  done?: true;
+};
+
 function single(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
 }
 
 export function isScripted(formData: FormData): boolean {
   return formData.get(scriptField) === "on";
+}
+
+export function isDialogSubmit(formData: FormData): boolean {
+  return isScripted(formData) && formData.get(dialogField) === "on";
 }
 
 export function safeReturnPath(value: unknown): string | null {

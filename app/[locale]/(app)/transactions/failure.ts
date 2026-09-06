@@ -1,4 +1,4 @@
-import type { SearchParams } from "@/lib/forms/state";
+import type { FormState, SearchParams } from "@/lib/forms/state";
 
 export const transactionFormErrorCodes = [
   "VALIDATION_FAILED",
@@ -11,10 +11,7 @@ export const transactionFormErrorCodes = [
 export type TransactionFormErrorCode =
   (typeof transactionFormErrorCodes)[number];
 
-export type TransactionFormState = {
-  code?: TransactionFormErrorCode;
-  invalid?: string[];
-};
+export type TransactionFormState = FormState<TransactionFormErrorCode>;
 
 function single(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
