@@ -6,7 +6,7 @@ monthly spending limits and reads the totals back in a single reporting
 currency.
 
 Built as a practice project for BSUIR. The requirements, the data model and
-the REST contract were written before the code and live in [`docs/`](docs).
+the REST contract were written before the code.
 
 ## Demo
 
